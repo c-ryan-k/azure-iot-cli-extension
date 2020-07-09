@@ -46,10 +46,15 @@ class ModelApiProvider(PnPModelRepositoryApiManager):
         model_id,
     ):
         try:
+            model_response = self.mgmt_sdk.get_model_async(model_id, raw=True)
+            etag = model_response.response.headers.get('eTag', None)
+            if not etag:
+                raise CLIError('No model found with @id `{}` to publish'.format(model_id))
+            etag = etag.replace('\\"', '')
             return self.mgmt_sdk.create_or_update_async(
                 model_id=model_id,
                 update_metadata=True,
-                if_match='*',
+                if_match=etag,
                 x_ms_model_state=ModelState.listed.value,
                 raw=True,
             ).response.json()

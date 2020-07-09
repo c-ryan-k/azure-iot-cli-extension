@@ -149,9 +149,9 @@ class TestModelRepoModelPublish(object):
             "@context": "http://azureiot.com/v1/contexts/CapabilityModel.json",
         }
         test_side_effect = [
-            build_mock_response(mocker, request.param[0], payload=payload_list),
-            build_mock_response(mocker, request.param[1], payload=payload_show),
-            build_mock_response(mocker, request.param[2], {}),
+            build_mock_response(mocker, request.param[0], payload=payload_list, headers={'eTag': 'eTag'}),
+            build_mock_response(mocker, request.param[1], payload=payload_show, headers={'eTag': 'eTag'}),
+            build_mock_response(mocker, request.param[2], {}, headers={'eTag': 'eTag'}),
         ]
         service_client.side_effect = test_side_effect
         return service_client
