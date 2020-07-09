@@ -59,7 +59,7 @@ class TestModelRepoModelCreate(object):
 
         model_id = json.loads(payload)["@id"]
         dataplane.iot_pnp_model_create(
-            cmd=fixture_cmd, model_id=model_id, model=payload,
+            cmd=fixture_cmd, model=payload,
         )
         args = serviceclient.call_args
         url = args[0][0].url
@@ -83,18 +83,19 @@ class TestModelRepoModelCreate(object):
             payload = payload_scenario[1]
         payload = str(read_file_content(_pnp_create_model_payload_file))
 
-        model_id = json.loads(payload)["@id"]
+        payload = json.loads(payload)
+        del payload["@id"]
+        payload = json.dumps(payload)
         with pytest.raises(CLIError):
             dataplane.iot_pnp_model_create(
-                fixture_cmd, model_id=model_id, model=payload,
+                fixture_cmd, model=payload,
             )
 
     @pytest.mark.parametrize("model_id, exp", [("", CLIError)])
     def test_model_create_invalid_args(self, serviceclient, model_id, exp):
-        payload_scenario = generate_pnp_model_create_payload()[1]
         with pytest.raises(exp):
             dataplane.iot_pnp_model_create(
-                fixture_cmd, model_id=model_id, model=payload_scenario
+                fixture_cmd, model='{{}'
             )
 
     def test_model_create_invalid_payload(self, serviceclient):
@@ -104,7 +105,7 @@ class TestModelRepoModelCreate(object):
         del payload["@id"]
         payload = json.dumps(payload)
         with pytest.raises(CLIError):
-            dataplane.iot_pnp_model_create(fixture_cmd, model_id=None, model=payload)
+            dataplane.iot_pnp_model_create(fixture_cmd, model=payload)
 
 
 class TestModelRepoModelPublish(object):

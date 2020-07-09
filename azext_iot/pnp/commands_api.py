@@ -39,16 +39,14 @@ def iot_pnp_model_list(
     return ap.search_models(search_options, shared, top)
 
 
-def iot_pnp_model_create(cmd, model_id, model):
-    if not model_id or not model:
-        raise CLIError(
-            "Please provide a model id [-m, --model-id] and a model definition [--model]"
-        )
+def iot_pnp_model_create(cmd, model):
+    if not model:
+        raise CLIError("Please provide a model definition [--model]")
     ap = ModelApiProvider(cmd)
     model = process_json_arg(model, argument_name="model")
-    is_valid = ap.validate_models([model], validate_dependencies=True)
-    if isinstance(is_valid, ServiceError):
-        raise CLIError("{}: {}".format(is_valid.code, is_valid.message))
+    model_id = model.get("@id", None)
+    if not model_id:
+        raise CLIError("Model is invalid - @id attribute required.")
     return ap.create_model(model_id, model)
 
 
