@@ -20,13 +20,6 @@ _pnp_generic_model_id = "urn:example:capabilityModels:Mxchip:1"
 mock_target = {}
 
 
-@pytest.fixture()
-def fixture_ghcs(mocker):
-    ghcs = mocker
-    ghcs.return_value = mock_target
-    return ghcs
-
-
 def generate_pnp_model_create_payload(content_from_file=False):
     if content_from_file:
         return (None, _pnp_create_model_payload_file)
@@ -40,7 +33,7 @@ def generate_pnp_model_create_payload(content_from_file=False):
 @pytest.mark.usefixtures("set_cwd")
 class TestModelRepoModelCreate(object):
     @pytest.fixture(params=[200])
-    def serviceclient(self, mocker, fixture_ghcs, request, set_cwd):
+    def serviceclient(self, mocker, request, set_cwd):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, {})
         return service_client
@@ -110,7 +103,7 @@ class TestModelRepoModelCreate(object):
 
 class TestModelRepoModelPublish(object):
     @pytest.fixture(params=[400, 418, 503])
-    def serviceclient_publish_errors(self, mocker, fixture_ghcs, fixture_sas, request):
+    def serviceclient_publish_errors(self, mocker, fixture_sas, request):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(
             mocker, request.param, {"error": "something failed"}
@@ -118,7 +111,7 @@ class TestModelRepoModelPublish(object):
         return service_client
 
     @pytest.fixture(params=[(200, 200, 201), (200, 200, 204), (200, 200, 412)])
-    def serviceclient(self, mocker, fixture_ghcs, request):
+    def serviceclient(self, mocker, request):
         service_client = mocker.patch(path_service_client)
         payload_list = {
             "continuationToken": "null",
@@ -183,7 +176,7 @@ class TestModelRepoModelPublish(object):
 
 class TestModelRepoModelShow(object):
     @pytest.fixture(params=[200])
-    def serviceclient(self, mocker, fixture_ghcs, request):
+    def serviceclient(self, mocker, request):
         service_client = mocker.patch(path_service_client)
         payload = {
             "@id": "urn:example:capabilityModels:Mxchip:1",
@@ -200,7 +193,7 @@ class TestModelRepoModelShow(object):
         return service_client
 
     @pytest.fixture(params=[404, 500])
-    def serviceclient_generic_error(self, mocker, fixture_ghcs, fixture_sas, request):
+    def serviceclient_generic_error(self, mocker, fixture_sas, request):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(
             mocker, request.param, {"error": "something failed"}
@@ -227,7 +220,7 @@ class TestModelRepoModelShow(object):
         assert "error" in response
 
     @pytest.fixture(params=[400])
-    def serviceclientemptyresult(self, mocker, fixture_ghcs, request):
+    def serviceclientemptyresult(self, mocker, request):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, {})
         return service_client
@@ -244,7 +237,7 @@ class TestModelRepoModelShow(object):
 
 class TestModelRepoModelList(object):
     @pytest.fixture(params=[200])
-    def service_client(self, mocker, fixture_ghcs, request):
+    def service_client(self, mocker, request):
         serviceclient = mocker.patch(path_service_client)
         payload = json.dumps(
             [
@@ -276,7 +269,7 @@ class TestModelRepoModelList(object):
         return serviceclient
 
     @pytest.fixture(params=[400, 503])
-    def serviceclient_generic_error(self, mocker, fixture_ghcs, fixture_sas, request):
+    def serviceclient_generic_error(self, mocker, fixture_sas, request):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(
             mocker, request.param, {"error": "something failed"}
@@ -334,7 +327,7 @@ class TestModelRepoModelList(object):
 
 class TestModelRepoRepoCreate(object):
     @pytest.fixture(params=[200])
-    def serviceclient(self, mocker, fixture_ghcs, request, set_cwd):
+    def serviceclient(self, mocker, request, set_cwd):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, {})
         return service_client
@@ -353,7 +346,7 @@ class TestModelRepoRepoCreate(object):
 
 class TestModelRepoRepoList(object):
     @pytest.fixture(params=[200])
-    def serviceclient(self, mocker, fixture_ghcs, request, set_cwd):
+    def serviceclient(self, mocker, request, set_cwd):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, [{}])
         return service_client
@@ -372,13 +365,13 @@ class TestModelRepoRepoList(object):
 
 class TestModelRepoRBAC(object):
     @pytest.fixture(params=[200])
-    def serviceclient(self, mocker, fixture_ghcs, request, set_cwd):
+    def serviceclient(self, mocker, request, set_cwd):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, {})
         return service_client
 
     @pytest.fixture(params=[200])
-    def serviceclient_arr(self, mocker, fixture_ghcs, request, set_cwd):
+    def serviceclient_arr(self, mocker, request, set_cwd):
         service_client = mocker.patch(path_service_client)
         service_client.return_value = build_mock_response(mocker, request.param, [{}])
         return service_client
