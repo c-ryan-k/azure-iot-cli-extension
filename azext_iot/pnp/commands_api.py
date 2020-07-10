@@ -10,10 +10,10 @@ from knack.util import CLIError
 from azext_iot.common.utility import process_json_arg
 
 
-def iot_pnp_model_show(cmd, model_id, expand=False):
+def iot_pnp_model_show(cmd, model_id, expand=False, pnp_dns_suffix=None):
     if not model_id:
         raise CLIError("Please provide a model id [-m, --model-id]")
-    ap = ModelApiProvider(cmd)
+    ap = ModelApiProvider(cmd, pnp_dns_suffix)
     return ap.get_model(model_id, expand)
 
 
@@ -26,8 +26,9 @@ def iot_pnp_model_list(
     created_by=None,
     shared=False,
     top=None,
+    pnp_dns_suffix=None,
 ):
-    ap = ModelApiProvider(cmd)
+    ap = ModelApiProvider(cmd, pnp_dns_suffix)
     search_options = ModelSearchOptions(
         search_keyword=keyword,
         model_type=model_type,
@@ -39,10 +40,10 @@ def iot_pnp_model_list(
     return ap.search_models(search_options, shared, top)
 
 
-def iot_pnp_model_create(cmd, model):
+def iot_pnp_model_create(cmd, model, pnp_dns_suffix=None):
     if not model:
         raise CLIError("Please provide a model definition [--model]")
-    ap = ModelApiProvider(cmd)
+    ap = ModelApiProvider(cmd, pnp_dns_suffix)
     model = process_json_arg(model, argument_name="model")
     model_id = model.get("@id")
     if not model_id:
@@ -50,8 +51,8 @@ def iot_pnp_model_create(cmd, model):
     return ap.create_model(model_id, model)
 
 
-def iot_pnp_model_publish(cmd, model_id):
+def iot_pnp_model_publish(cmd, model_id, pnp_dns_suffix=None):
     if not model_id:
         raise CLIError("Please provide a model id [-m, --model-id]")
-    ap = ModelApiProvider(cmd)
+    ap = ModelApiProvider(cmd, pnp_dns_suffix)
     return ap.publish_model(model_id=model_id)
