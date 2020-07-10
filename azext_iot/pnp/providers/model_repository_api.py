@@ -47,7 +47,7 @@ class ModelApiProvider(PnPModelRepositoryApiManager):
     ):
         try:
             model_response = self.mgmt_sdk.get_model_async(model_id, raw=True)
-            etag = model_response.response.headers.get('eTag', None)
+            etag = model_response.response.headers.get('eTag')
             if not etag:
                 raise CLIError('No model found with @id `{}` to publish'.format(model_id))
             etag = etag.replace('\\"', '')

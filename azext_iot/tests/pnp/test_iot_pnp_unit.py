@@ -296,11 +296,11 @@ class TestModelRepoModelList(object):
     def test_model_list(self, fixture_cmd, service_client, search_content, shared):
         result = dataplane.iot_pnp_model_list(
             fixture_cmd,
-            keyword=search_content.get("searchKeyword", None),
-            model_type=search_content.get("modelType", None),
-            model_state=search_content.get("modelState", None),
-            publisher_id=search_content.get("publisherId", None),
-            created_by=search_content.get("createdBy", None),
+            keyword=search_content.get("searchKeyword"),
+            model_type=search_content.get("modelType"),
+            model_state=search_content.get("modelState"),
+            publisher_id=search_content.get("publisherId"),
+            created_by=search_content.get("createdBy"),
             shared=shared,
         )
         args = service_client.call_args

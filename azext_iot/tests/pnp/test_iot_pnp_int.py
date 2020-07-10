@@ -16,7 +16,6 @@ from azext_iot.common.utility import read_file_content
 from azext_iot.common.embedded_cli import EmbeddedCLI
 from azext_iot.pnp.common import RoleIdentifier
 
-_interface_payload = "test_pnp_create_payload_interface.json"
 _capability_model_payload = "test_pnp_create_payload_model.json"
 
 
@@ -96,7 +95,7 @@ class TestPnPModelLifecycle(PNPLiveScenarioTest):
 
     def test_model_lifecycle(self):
 
-        # # Error: Invalid model definition file
+        # Error: Invalid model definition file
         self.cmd(
             "iot pnp model create --model ''", expect_failure=True,
         )

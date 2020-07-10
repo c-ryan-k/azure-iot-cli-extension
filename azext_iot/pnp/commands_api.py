@@ -44,7 +44,7 @@ def iot_pnp_model_create(cmd, model):
         raise CLIError("Please provide a model definition [--model]")
     ap = ModelApiProvider(cmd)
     model = process_json_arg(model, argument_name="model")
-    model_id = model.get("@id", None)
+    model_id = model.get("@id")
     if not model_id:
         raise CLIError("Model is invalid - @id attribute required.")
     return ap.create_model(model_id, model)
