@@ -8,6 +8,7 @@ from azext_iot.pnp.providers.model_repository_api import ModelApiProvider
 from azext_iot.sdk.pnp.dataplane.models import ModelSearchOptions, ServiceError
 from knack.util import CLIError
 from azext_iot.common.utility import process_json_arg
+from azext_iot.operations.generic import _process_top
 
 
 def iot_pnp_model_show(cmd, model_id, expand=False, pnp_dns_suffix=None):
@@ -37,7 +38,7 @@ def iot_pnp_model_list(
         created_by=created_by,
     )
 
-    return ap.search_models(search_options, shared, top)
+    return ap.search_models(search_options, shared, _process_top(top))
 
 
 def iot_pnp_model_create(cmd, model, pnp_dns_suffix=None):

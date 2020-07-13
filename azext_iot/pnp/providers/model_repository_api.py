@@ -71,7 +71,6 @@ class ModelApiProvider(PnPModelRepositoryApiManager):
                 model_search_options=search_options,
                 x_ms_show_shared_models_only=shared_models_only,
                 custom_headers=headers,
-                x_ms_page_size=top,
                 raw=True,
             )
 
