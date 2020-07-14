@@ -108,6 +108,20 @@ def _load_central_devices_help():
     """
 
     helps[
+        "iot central app device show-credentials"
+    ] = """
+        type: command
+        short-summary: Get device credentials from IoT Central
+
+        examples:
+        - name: Get device credentials for a device
+          text: >
+            az iot central app device show-credentials
+            --app-id {appid}
+            --device-id {deviceid}
+    """
+
+    helps[
         "iot central app device registration-info"
     ] = """
         type: command
@@ -374,6 +388,22 @@ def _load_central_monitors_help():
         - name: Basic usage
           text: >
             az iot central app monitor-properties --app-id {app_id} -d {device_id}
+    """
+
+    helps[
+        "iot central app validate-properties"
+    ] = """
+        type: command
+        short-summary: Validate reported properties sent to IoT Central app.
+        long-summary: |
+                    Performs validations on reported property updates:
+                    1) Warning - Properties sent by device that are not modeled in central.
+                    2) Warning - Properties with same name declared in multiple interfaces
+                       should have interface name included as part of the property update.
+        examples:
+        - name: Basic usage
+          text: >
+            az iot central app validate-properties --app-id {app_id} -d {device_id}
     """
 
 
