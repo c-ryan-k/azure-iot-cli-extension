@@ -58,7 +58,6 @@ class TestModelRepoModelCreate(object):
         url = args[0][0].url
         method = args[0][0].method
         data = args[0][0].data
-        headers = args[0][0].headers
 
         assert method == "PUT"
         assert "/models/{}?".format(url_encode_str(model_id, plus=True)) in url
@@ -157,7 +156,6 @@ class TestModelRepoModelPublish(object):
         args = serviceclient.call_args
         url = args[0][0].url
         method = args[0][0].method
-        data = args[0][0].data
         headers = args[0][0].headers
         assert method == "PUT"
         assert "/models/{}?".format(url_encode_str(target_model, plus=True)) in url
@@ -206,7 +204,6 @@ class TestModelRepoModelShow(object):
         args = serviceclient.call_args
         url = args[0][0].url
         method = args[0][0].method
-        headers = args[0][0].headers
 
         assert method == "GET"
         assert "/models/{}?".format(url_encode_str(target_model, plus=True)) in url
@@ -337,8 +334,6 @@ class TestModelRepoRepoCreate(object):
         args = serviceclient.call_args
         url = args[0][0].url
         method = args[0][0].method
-        data = args[0][0].data
-        headers = args[0][0].headers
 
         assert "/tenants" in url
         assert method == "PUT"
@@ -356,8 +351,6 @@ class TestModelRepoRepoList(object):
         args = serviceclient.call_args
         url = args[0][0].url
         method = args[0][0].method
-        data = args[0][0].data
-        headers = args[0][0].headers
 
         assert "/tenants" in url
         assert method == "GET"
@@ -432,7 +425,6 @@ class TestModelRepoRBAC(object):
         url = args[0][0].url
         method = args[0][0].method
         data = json.loads(args[0][0].data)
-        headers = args[0][0].headers
 
         assert method == "PUT"
         assert (
@@ -462,7 +454,6 @@ class TestModelRepoRBAC(object):
         args = serviceclient_arr.call_args
         url = args[0][0].url
         method = args[0][0].method
-        headers = args[0][0].headers
 
         assert method == "GET"
         assert (
@@ -510,7 +501,7 @@ class TestModelRepoRBAC(object):
         args = serviceclient.call_args
         url = args[0][0].url
         method = args[0][0].method
-        headers = args[0][0].headers
+
         assert method == "DELETE"
         assert (
             "/resources/{0}/types/{1}/subjects/{2}/roles/{3}".format(
