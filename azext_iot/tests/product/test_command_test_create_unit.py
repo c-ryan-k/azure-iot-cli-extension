@@ -288,12 +288,10 @@ class TestTestCreateUnit(unittest.TestCase):
         mock_from_file.assert_called_with("somefile")
         mock_sdk_create.assert_called_with(provisioning=True, body=mock_file_data)
 
-    @mock.patch("azext_iot.product.test.command_test_tasks.create")
+    @mock.patch("azext_iot.product.command_product.initialize_workspace")
     @mock.patch("azext_iot.sdk.product.aicsapi.AICSAPI.create_device_test")
     @mock.patch("azext_iot.product.test.command_tests._process_models_directory")
-    def test_create_with_generate_tests(
-        self, mock_process_models, mock_service, mock_tasks_create,
-    ):
+    def test_create_with_init(self, mock_process_models, mock_service, mock_init):
         mock_process_models.return_value = [
             '{"@id":"model1"}',
             '{"@id":"model2"}',
@@ -307,19 +305,18 @@ class TestTestCreateUnit(unittest.TestCase):
             self,
             attestation_type=AttestationType.tpm.value,
             endorsement_key="12345",
-            product_id=self.product_id,
+            init=True,
+            product_name="test_product",
             device_type=DeviceType.DevKit.value,
             models="models_folder",
             badge_type=BadgeType.Pnp.value,
-            generate_test_cases=True
         )
-
         mock_process_models.assert_called_with("models_folder")
         mock_service.assert_called_with(
             provisioning=True,
             body={
                 "validationType": "Certification",
-                "productId": self.product_id,
+                "productId": mock_init.return_value["id"],
                 "deviceType": "DevKit",
                 "provisioningConfiguration": {
                     "type": "TPM",
@@ -337,10 +334,6 @@ class TestTestCreateUnit(unittest.TestCase):
                 ],
             },
         )
-        mock_tasks_create.assert_called_with(
-            cmd=self,
-            test_id="test123",
-            task_type=TaskType.GenerateTestCases.value,
-            wait=True,
-            base_url=None
+        mock_init.assert_called_with(
+            cmd=self, product_name="test_product", working_folder="PnPCert"
         )

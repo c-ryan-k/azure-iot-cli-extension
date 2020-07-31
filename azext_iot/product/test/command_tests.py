@@ -5,6 +5,7 @@
 # --------------------------------------------------------------------------------------------
 
 from azext_iot.product.providers.aics import AICSProvider
+from .. import command_product as product_commands
 from azext_iot.sdk.product.models import DeviceTestSearchOptions
 from azext_iot.product.shared import BadgeType, AttestationType, TaskType
 from knack.log import get_logger
@@ -27,8 +28,19 @@ def create(
     models=None,
     skip_provisioning=False,
     base_url=None,
-    generate_test_cases=False
+    init=False,
+    product_name=None,
+    working_folder="PnPCert",
 ):
+    if init:
+        if not product_name:
+            raise CLIError(
+                "In order to initialize a product, a product name is required."
+            )
+        config = product_commands.initialize_workspace(
+            cmd=cmd, product_name=product_name, working_folder=working_folder
+        )
+        product_id = config["id"]
     if attestation_type == AttestationType.x509.value and not certificate_path:
         raise CLIError("If attestation type is x509, certificate path is required")
     if attestation_type == AttestationType.tpm.value and not endorsement_key:
@@ -36,7 +48,7 @@ def create(
     if badge_type == BadgeType.Pnp.value and not models:
         raise CLIError("If badge type is Pnp, models is required")
     if badge_type == BadgeType.IotEdgeCompatible.value and not all(
-        [connection_string, attestation_type == AttestationType.connectionString.value, ]
+        [connection_string, attestation_type == AttestationType.connectionString.value,]
     ):
         raise CLIError(
             "Connection string is required for Edge Compatible modules testing"
@@ -78,19 +90,7 @@ def create(
         test_configuration=test_configuration, provisioning=provisioning
     )
 
-    if not generate_test_cases:
-        return test_data
-
-    test_id = test_data.id
-
-    import azext_iot.product.test.command_test_tasks as tasks
-    return tasks.create(
-        cmd=cmd,
-        test_id=test_id,
-        task_type=TaskType.GenerateTestCases.value,
-        wait=True,
-        base_url=base_url
-    )
+    return test_data
 
 
 def show(cmd, test_id, base_url=None):
@@ -119,7 +119,7 @@ def update(
     if badge_type == BadgeType.Pnp.value and not models:
         raise CLIError("If badge type is Pnp, models is required")
     if badge_type == BadgeType.IotEdgeCompatible.value and not all(
-        [connection_string, attestation_type == AttestationType.connectionString.value, ]
+        [connection_string, attestation_type == AttestationType.connectionString.value,]
     ):
         raise CLIError(
             "Connection string is required for Edge Compatible modules testing"
@@ -133,7 +133,11 @@ def update(
     ap = AICSProvider(cmd, base_url)
     if configuration_file:
         test_configuration = _create_from_file(configuration_file)
-        return ap.update_test(test_id=test_id, test_configuration=test_configuration, provisioning=provisioning)
+        return ap.update_test(
+            test_id=test_id,
+            test_configuration=test_configuration,
+            provisioning=provisioning,
+        )
 
     if not any([attestation_type, badge_type, models]):
         raise CLIError(
@@ -183,15 +187,21 @@ def update(
     ) and models:
         models_array = _process_models_directory(models)
         test_configuration["certificationBadgeConfigurations"] = [
-            {"type": BadgeType.Pnp.value, "digitalTwinModelDefinitions": models_array, }
+            {"type": BadgeType.Pnp.value, "digitalTwinModelDefinitions": models_array,}
         ]
     elif badge_type:
         test_configuration["certificationBadgeConfigurations"] = [{"type": badge_type}]
 
-    return ap.update_test(test_id=test_id, test_configuration=test_configuration, provisioning=provisioning)
+    return ap.update_test(
+        test_id=test_id,
+        test_configuration=test_configuration,
+        provisioning=provisioning,
+    )
 
 
-def search(cmd, product_id=None, registration_id=None, certificate_name=None, base_url=None):
+def search(
+    cmd, product_id=None, registration_id=None, certificate_name=None, base_url=None
+):
     if not any([product_id or registration_id or certificate_name]):
         raise CLIError("At least one search criteria must be specified")
 

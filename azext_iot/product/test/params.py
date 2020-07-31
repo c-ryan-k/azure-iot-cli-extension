@@ -78,11 +78,10 @@ def load_product_test_params(self, _):
         )
     with self.argument_context("iot product test create") as c:
         c.argument(
-            "generate_test_cases",
-            options_list=["--generate-test-cases", "--gtc"],
-            help="When specified, will call service to generate test cases based on PnP information specified. "
-            "Only applies to PnP devices.",
-            arg_type=get_three_state_flag()
+            "init",
+            options_list=["--init"],
+            help="When specified, will initialize a local file with product information, and pass that product ID to the test creation.",
+            arg_type=get_three_state_flag(),
         )
     with self.argument_context("iot product test search") as c:
         c.argument(

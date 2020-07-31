@@ -100,3 +100,4 @@ def initialize_workspace(cmd, product_name, working_folder="PnPCert"):
         encoding="utf-8",
     ) as f:
         dump(obj=product_config, fp=f, indent=4, sort_keys=False)
+    return product_config

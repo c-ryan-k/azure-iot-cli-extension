@@ -30,6 +30,9 @@ def load_help():
         - name: Do not have service create provisioning configuration
           text: >
             az iot product test create --configuration-file {configuration_file} --skip-provisioning
+        - name: Initialize local workspace for a product and create a new product test
+          text: >
+            az iot product test create --cf {configuration_file} --init --product-name {product_name} --wf {working_foder}
     """
     helps[
         "iot product test search"
