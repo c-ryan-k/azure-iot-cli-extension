@@ -164,8 +164,8 @@ class TestProductDeviceTestTasks(AICSLiveScenarioTest):
 
         assert show["status"] == DeviceTestTaskStatus.cancelled.value
 
-        # Submit run
-        self.cmd(
-            "iot product test run submit -t {device_test_id} -r {run_id} --base-url {BASE_URL}",
-            expect_failure=True,
-        )
+        # # Submit run
+        # self.cmd(
+        #     "iot product test run submit -t {device_test_id} -r {run_id} --base-url {BASE_URL}",
+        #     expect_failure=True,
+        # )
