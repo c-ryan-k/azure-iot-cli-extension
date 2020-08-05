@@ -38,7 +38,7 @@ def load_help():
             az iot product test create --attestation-type TPM --device-type {device_type} --endorsement-key {endorsement_key}
         - name: Creating test with x509 attestation
           text: >
-            az iot product test create --attestation-type x509 --device-type {device_type} --certificate-path
+            az iot product test create --attestation-type x509 --device-type {device_type} --certificate-path {certificate_path}
         - name: Creating test for Edge module
           text: >
             az iot product test create --attestation-type ConnectionString --device-type {device_type} --badge-type IotEdgeCompatible --connection-string {connection_string}
