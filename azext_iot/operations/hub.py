@@ -1838,12 +1838,21 @@ def _iot_c2d_message_abandon(target, device_id, etag):
 
 
 def iot_c2d_message_receive(
-    cmd, device_id, hub_name=None, lock_timeout=60, resource_group_name=None, login=None
+    cmd,
+    device_id,
+    hub_name=None,
+    lock_timeout=60,
+    resource_group_name=None,
+    login=None,
+    ack=None,
 ):
     discovery = IotHubDiscovery(cmd)
     target = discovery.get_target(
         hub_name=hub_name, resource_group_name=resource_group_name, login=login
     )
+    if ack:
+        _handle_c2d_msg(target, device_id, ack, lock_timeout)
+        pass
     return _iot_c2d_message_receive(target, device_id, lock_timeout)
 
 
@@ -2079,8 +2088,8 @@ def _iot_simulate_get_default_properties(protocol):
     return default_properties
 
 
-def _handle_c2d_msg(target, device_id, receive_settle):
-    result = _iot_c2d_message_receive(target, device_id)
+def _handle_c2d_msg(target, device_id, receive_settle, lock_timeout=60):
+    result = _iot_c2d_message_receive(target, device_id, lock_timeout)
     if result:
         six.print_()
         six.print_("__Received C2D Message__")
