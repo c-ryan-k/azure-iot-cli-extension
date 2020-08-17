@@ -23,6 +23,7 @@ from azext_iot.common.shared import (
     ProtocolType,
     ConfigType,
     KeyType,
+    SettleType
 )
 from azext_iot.iothub.providers.discovery import IotHubDiscovery
 from azext_iot.common.utility import (
@@ -1850,13 +1851,10 @@ def iot_c2d_message_receive(
     target = discovery.get_target(
         hub_name=hub_name, resource_group_name=resource_group_name, login=login
     )
-    if ack:
-        _handle_c2d_msg(target, device_id, ack, lock_timeout)
-        pass
-    return _iot_c2d_message_receive(target, device_id, lock_timeout)
+    return _iot_c2d_message_receive(target, device_id, lock_timeout, ack)
 
 
-def _iot_c2d_message_receive(target, device_id, lock_timeout=60):
+def _iot_c2d_message_receive(target, device_id, lock_timeout=60, ack=None):
     from azext_iot.constants import MESSAGING_HTTP_C2D_SYSTEM_PROPERTIES
 
     resolver = SdkResolver(target=target, device_id=device_id)
@@ -1875,7 +1873,19 @@ def _iot_c2d_message_receive(target, device_id, lock_timeout=60):
             payload = {"properties": {}}
 
             if "etag" in result.headers:
-                payload["etag"] = result.headers["etag"].strip('"')
+                eTag = result.headers["etag"].strip('"')
+                payload["etag"] = eTag
+
+                if ack:
+                    ack_response = {}
+                    if ack == SettleType.abandon.value:
+                        ack_response = device_sdk.device.abandon_device_bound_notification(id=device_id, etag=eTag, raw=True)
+                    elif ack == SettleType.reject.value:
+                        ack_response = device_sdk.device.complete_device_bound_notification(id=device_id, etag=eTag, reject="", raw=True)
+                    else:
+                        ack_response = device_sdk.device.complete_device_bound_notification(id=device_id, etag=eTag, raw=True)
+
+                    payload['ack'] = ack if (ack_response and ack_response.response.status_code == 204) else None
 
             app_prop_prefix = "iothub-app-"
             app_prop_keys = [
