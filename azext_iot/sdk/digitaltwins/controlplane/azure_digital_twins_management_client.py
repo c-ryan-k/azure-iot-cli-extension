@@ -43,12 +43,9 @@ class AzureDigitalTwinsManagementClientConfiguration(AzureConfiguration):
         if not base_url:
             base_url = 'https://management.azure.com'
 
-        # @digimaun - use azmock server
-        # base_url = 'http://127.0.0.1:8005'
-
         super(AzureDigitalTwinsManagementClientConfiguration, self).__init__(base_url)
 
-        self.add_user_agent('azuredigitaltwinsmanagementclient/{}'.format(VERSION))
+        self.add_user_agent('azure-mgmt-digitaltwins/{}'.format(VERSION))
         self.add_user_agent(USER_AGENT)
 
         self.credentials = credentials
@@ -62,15 +59,11 @@ class AzureDigitalTwinsManagementClient(SDKClient):
     :vartype config: AzureDigitalTwinsManagementClientConfiguration
 
     :ivar digital_twins: DigitalTwins operations
-    :vartype digital_twins: digitaltwins-arm.operations.DigitalTwinsOperations
+    :vartype digital_twins: azure.mgmt.digitaltwins.operations.DigitalTwinsOperations
     :ivar digital_twins_endpoint: DigitalTwinsEndpoint operations
-    :vartype digital_twins_endpoint: digitaltwins-arm.operations.DigitalTwinsEndpointOperations
-    :ivar io_thub: IoTHub operations
-    :vartype io_thub: digitaltwins-arm.operations.IoTHubOperations
-    :ivar digital_twins_io_thubs: DigitalTwinsIoTHubs operations
-    :vartype digital_twins_io_thubs: digitaltwins-arm.operations.DigitalTwinsIoTHubsOperations
+    :vartype digital_twins_endpoint: azure.mgmt.digitaltwins.operations.DigitalTwinsEndpointOperations
     :ivar operations: Operations operations
-    :vartype operations: digitaltwins-arm.operations.Operations
+    :vartype operations: azure.mgmt.digitaltwins.operations.Operations
 
     :param credentials: Credentials needed for the client to connect to Azure.
     :type credentials: :mod:`A msrestazure Credentials
@@ -87,7 +80,7 @@ class AzureDigitalTwinsManagementClient(SDKClient):
         super(AzureDigitalTwinsManagementClient, self).__init__(self.config.credentials, self.config)
 
         client_models = {k: v for k, v in models.__dict__.items() if isinstance(v, type)}
-        self.api_version = '2020-03-01-preview'
+        self.api_version = '2020-10-31'
         self._serialize = Serializer(client_models)
         self._deserialize = Deserializer(client_models)
 

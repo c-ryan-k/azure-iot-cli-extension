@@ -24,7 +24,7 @@ class DigitalTwinsEndpointOperations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-03-01-preview".
+    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-10-31".
     """
 
     models = models
@@ -34,7 +34,7 @@ class DigitalTwinsEndpointOperations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-03-01-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
@@ -54,9 +54,9 @@ class DigitalTwinsEndpointOperations(object):
          overrides<msrest:optionsforoperations>`.
         :return: An iterator like instance of DigitalTwinsEndpointResource
         :rtype:
-         ~digitaltwins-arm.models.DigitalTwinsEndpointResourcePaged[~digitaltwins-arm.models.DigitalTwinsEndpointResource]
+         ~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResourcePaged[~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         def internal_paging(next_link=None, raw=False):
 
@@ -66,7 +66,7 @@ class DigitalTwinsEndpointOperations(object):
                 path_format_arguments = {
                     'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
                     'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-                    'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1)
+                    'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$')
                 }
                 url = self._client.format_url(url, **path_format_arguments)
 
@@ -125,18 +125,18 @@ class DigitalTwinsEndpointOperations(object):
         :param operation_config: :ref:`Operation configuration
          overrides<msrest:optionsforoperations>`.
         :return: DigitalTwinsEndpointResource or ClientRawResponse if raw=true
-        :rtype: ~digitaltwins-arm.models.DigitalTwinsEndpointResource or
-         ~msrest.pipeline.ClientRawResponse
+        :rtype: ~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource
+         or ~msrest.pipeline.ClientRawResponse
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         # Construct URL
         url = self.get.metadata['url']
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1),
-            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=64, min_length=1, pattern=r'^[A-Za-z0-9-._]{1,64}$')
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$'),
+            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=49, min_length=2, pattern=r'^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -163,9 +163,8 @@ class DigitalTwinsEndpointOperations(object):
 
         deserialized = None
 
-        # @digimaun - DigitalTwinsEndpointResource -> {object}
         if response.status_code == 200:
-            deserialized = self._deserialize('{object}', response)
+            deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -174,18 +173,18 @@ class DigitalTwinsEndpointOperations(object):
         return deserialized
     get.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DigitalTwins/digitalTwinsInstances/{resourceName}/endpoints/{endpointName}'}
 
-    # @digimaun - custom add properties
+
     def _create_or_update_initial(
-            self, resource_group_name, resource_name, endpoint_name, properties, custom_headers=None, raw=False, **operation_config):
-        endpoint_description = properties
+            self, resource_group_name, resource_name, endpoint_name, properties=None, custom_headers=None, raw=False, **operation_config):
+        endpoint_description = models.DigitalTwinsEndpointResource(properties=properties)
 
         # Construct URL
         url = self.create_or_update.metadata['url']
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1),
-            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=64, min_length=1, pattern=r'^[A-Za-z0-9-._]{1,64}$')
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$'),
+            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=49, min_length=2, pattern=r'^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -205,7 +204,7 @@ class DigitalTwinsEndpointOperations(object):
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
 
         # Construct body
-        body_content = self._serialize.body(endpoint_description, "{object}")
+        body_content = self._serialize.body(endpoint_description, 'DigitalTwinsEndpointResource')
 
         # Construct and send request
         request = self._client.put(url, query_parameters, header_parameters, body_content)
@@ -216,8 +215,10 @@ class DigitalTwinsEndpointOperations(object):
 
         deserialized = None
 
-        if response.status_code in [200, 201]:
-            deserialized = self._deserialize("{object}", response)
+        if response.status_code == 200:
+            deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
+        if response.status_code == 201:
+            deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -225,9 +226,8 @@ class DigitalTwinsEndpointOperations(object):
 
         return deserialized
 
-    # @digimaun - custom add properties
     def create_or_update(
-            self, resource_group_name, resource_name, endpoint_name, properties, custom_headers=None, raw=False, polling=True, **operation_config):
+            self, resource_group_name, resource_name, endpoint_name, properties=None, custom_headers=None, raw=False, polling=True, **operation_config):
         """Create or update DigitalTwinsInstance endpoint.
 
         :param resource_group_name: The name of the resource group that
@@ -237,8 +237,9 @@ class DigitalTwinsEndpointOperations(object):
         :type resource_name: str
         :param endpoint_name: Name of Endpoint Resource.
         :type endpoint_name: str
-        :param tags: The resource tags.
-        :type tags: dict[str, str]
+        :param properties: DigitalTwinsInstance endpoint resource properties.
+        :type properties:
+         ~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResourceProperties
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: The poller return type is ClientRawResponse, the
          direct response alongside the deserialized response
@@ -248,11 +249,11 @@ class DigitalTwinsEndpointOperations(object):
          DigitalTwinsEndpointResource or
          ClientRawResponse<DigitalTwinsEndpointResource> if raw==True
         :rtype:
-         ~msrestazure.azure_operation.AzureOperationPoller[~digitaltwins-arm.models.DigitalTwinsEndpointResource]
+         ~msrestazure.azure_operation.AzureOperationPoller[~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource]
          or
-         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~digitaltwins-arm.models.DigitalTwinsEndpointResource]]
+         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource]]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         raw_result = self._create_or_update_initial(
             resource_group_name=resource_group_name,
@@ -264,9 +265,8 @@ class DigitalTwinsEndpointOperations(object):
             **operation_config
         )
 
-        # @digimaun - DigitalTwinsEndpointResource -> {object}
         def get_long_running_output(response):
-            deserialized = self._deserialize('{object}', response)
+            deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
 
             if raw:
                 client_raw_response = ClientRawResponse(deserialized, response)
@@ -291,8 +291,8 @@ class DigitalTwinsEndpointOperations(object):
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1),
-            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=64, min_length=1, pattern=r'^[A-Za-z0-9-._]{1,64}$')
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$'),
+            'endpointName': self._serialize.url("endpoint_name", endpoint_name, 'str', max_length=49, min_length=2, pattern=r'^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -319,6 +319,8 @@ class DigitalTwinsEndpointOperations(object):
 
         deserialized = None
 
+        if response.status_code == 200:
+            deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
         if response.status_code == 202:
             deserialized = self._deserialize('DigitalTwinsEndpointResource', response)
 
@@ -348,11 +350,11 @@ class DigitalTwinsEndpointOperations(object):
          DigitalTwinsEndpointResource or
          ClientRawResponse<DigitalTwinsEndpointResource> if raw==True
         :rtype:
-         ~msrestazure.azure_operation.AzureOperationPoller[~digitaltwins-arm.models.DigitalTwinsEndpointResource]
+         ~msrestazure.azure_operation.AzureOperationPoller[~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource]
          or
-         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~digitaltwins-arm.models.DigitalTwinsEndpointResource]]
+         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource]]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         raw_result = self._delete_initial(
             resource_group_name=resource_group_name,

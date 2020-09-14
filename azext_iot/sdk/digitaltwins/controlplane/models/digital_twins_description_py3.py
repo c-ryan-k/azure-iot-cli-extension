@@ -32,20 +32,20 @@ class DigitalTwinsDescription(DigitalTwinsResource):
     :type tags: dict[str, str]
     :ivar created_time: Time when DigitalTwinsInstance was created.
     :vartype created_time: datetime
-    :ivar last_updated_time: Time when DigitalTwinsInstance was created.
+    :ivar last_updated_time: Time when DigitalTwinsInstance was updated.
     :vartype last_updated_time: datetime
     :ivar provisioning_state: The provisioning state. Possible values include:
-     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled'
+     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled', 'Deleted',
+     'Warning', 'Suspending', 'Restoring', 'Moving'
     :vartype provisioning_state: str or
-     ~digitaltwins-arm.models.ProvisioningState
+     ~azure.mgmt.digitaltwins.models.ProvisioningState
     :ivar host_name: Api endpoint to work with DigitalTwinsInstance.
     :vartype host_name: str
     """
 
-    # @digimaun - removed SKU references
     _validation = {
         'id': {'readonly': True},
-        'name': {'readonly': True, 'pattern': r'^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$'},
+        'name': {'readonly': True, 'pattern': r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$'},
         'type': {'readonly': True},
         'location': {'required': True},
         'created_time': {'readonly': True},

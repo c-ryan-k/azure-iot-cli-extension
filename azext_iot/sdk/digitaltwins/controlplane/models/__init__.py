@@ -10,7 +10,6 @@
 # --------------------------------------------------------------------------
 
 try:
-    from .digital_twins_sku_info_py3 import DigitalTwinsSkuInfo
     from .digital_twins_description_py3 import DigitalTwinsDescription
     from .digital_twins_patch_description_py3 import DigitalTwinsPatchDescription
     from .digital_twins_resource_py3 import DigitalTwinsResource
@@ -21,17 +20,12 @@ try:
     from .check_name_request_py3 import CheckNameRequest
     from .check_name_result_py3 import CheckNameResult
     from .external_resource_py3 import ExternalResource
-    from .integration_resource_py3 import IntegrationResource
-    from .integration_resource_update_info_py3 import IntegrationResourceUpdateInfo
-    from .integration_resource_state1_py3 import IntegrationResourceState1
     from .digital_twins_endpoint_resource_properties_py3 import DigitalTwinsEndpointResourceProperties
     from .digital_twins_endpoint_resource_py3 import DigitalTwinsEndpointResource
     from .service_bus_py3 import ServiceBus
     from .event_hub_py3 import EventHub
     from .event_grid_py3 import EventGrid
-    from .digital_twins_description_list_custom import DigitalTwinsDescriptionListCustom
 except (SyntaxError, ImportError):
-    from .digital_twins_sku_info import DigitalTwinsSkuInfo
     from .digital_twins_description import DigitalTwinsDescription
     from .digital_twins_patch_description import DigitalTwinsPatchDescription
     from .digital_twins_resource import DigitalTwinsResource
@@ -42,9 +36,6 @@ except (SyntaxError, ImportError):
     from .check_name_request import CheckNameRequest
     from .check_name_result import CheckNameResult
     from .external_resource import ExternalResource
-    from .integration_resource import IntegrationResource
-    from .integration_resource_update_info import IntegrationResourceUpdateInfo
-    from .integration_resource_state1 import IntegrationResourceState1
     from .digital_twins_endpoint_resource_properties import DigitalTwinsEndpointResourceProperties
     from .digital_twins_endpoint_resource import DigitalTwinsEndpointResource
     from .service_bus import ServiceBus
@@ -52,17 +43,14 @@ except (SyntaxError, ImportError):
     from .event_grid import EventGrid
 from .digital_twins_description_paged import DigitalTwinsDescriptionPaged
 from .digital_twins_endpoint_resource_paged import DigitalTwinsEndpointResourcePaged
-from .integration_resource_paged import IntegrationResourcePaged
 from .operation_paged import OperationPaged
 from .azure_digital_twins_management_client_enums import (
     ProvisioningState,
     Reason,
-    IntegrationResourceState,
     EndpointProvisioningState,
 )
 
 __all__ = [
-    'DigitalTwinsSkuInfo',
     'DigitalTwinsDescription',
     'DigitalTwinsPatchDescription',
     'DigitalTwinsResource',
@@ -73,9 +61,6 @@ __all__ = [
     'CheckNameRequest',
     'CheckNameResult',
     'ExternalResource',
-    'IntegrationResource',
-    'IntegrationResourceUpdateInfo',
-    'IntegrationResourceState1',
     'DigitalTwinsEndpointResourceProperties',
     'DigitalTwinsEndpointResource',
     'ServiceBus',
@@ -83,11 +68,8 @@ __all__ = [
     'EventGrid',
     'DigitalTwinsDescriptionPaged',
     'DigitalTwinsEndpointResourcePaged',
-    'IntegrationResourcePaged',
     'OperationPaged',
     'ProvisioningState',
     'Reason',
-    'IntegrationResourceState',
     'EndpointProvisioningState',
-    'DigitalTwinsDescriptionListCustom'
 ]

@@ -31,12 +31,12 @@ class DigitalTwinsResource(Model):
     :param tags: The resource tags.
     :type tags: dict[str, str]
     """
-    # @digimaun - removed SKU references
+
     _validation = {
         'id': {'readonly': True},
-        'name': {'readonly': True, 'pattern': r'^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$'},
+        'name': {'readonly': True, 'pattern': r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$'},
         'type': {'readonly': True},
-        'location': {'required': True}
+        'location': {'required': True},
     }
 
     _attribute_map = {
@@ -44,7 +44,7 @@ class DigitalTwinsResource(Model):
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
         'location': {'key': 'location', 'type': 'str'},
-        'tags': {'key': 'tags', 'type': '{str}'}
+        'tags': {'key': 'tags', 'type': '{str}'},
     }
 
     def __init__(self, *, location: str, tags=None, **kwargs) -> None:

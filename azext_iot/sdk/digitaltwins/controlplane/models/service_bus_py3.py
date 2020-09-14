@@ -13,7 +13,7 @@ from .digital_twins_endpoint_resource_properties_py3 import DigitalTwinsEndpoint
 
 
 class ServiceBus(DigitalTwinsEndpointResourceProperties):
-    """properties related to servicebus.
+    """Properties related to ServiceBus.
 
     Variables are only populated by the server, and will be ignored when
     sending a request.
@@ -21,21 +21,23 @@ class ServiceBus(DigitalTwinsEndpointResourceProperties):
     All required parameters must be populated in order to send to Azure.
 
     :ivar provisioning_state: The provisioning state. Possible values include:
-     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled'
+     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled', 'Deleted',
+     'Warning', 'Suspending', 'Restoring', 'Moving', 'Disabled'
     :vartype provisioning_state: str or
-     ~digitaltwins-arm.models.EndpointProvisioningState
+     ~azure.mgmt.digitaltwins.models.EndpointProvisioningState
     :ivar created_time: Time when the Endpoint was added to
      DigitalTwinsInstance.
     :vartype created_time: datetime
-    :param tags: The resource tags.
-    :type tags: dict[str, str]
+    :param dead_letter_secret: Dead letter storage secret. Will be obfuscated
+     during read.
+    :type dead_letter_secret: str
     :param endpoint_type: Required. Constant filled by server.
     :type endpoint_type: str
     :param primary_connection_string: Required. PrimaryConnectionString of the
-     endpoint. Will be obfuscated during read
+     endpoint. Will be obfuscated during read.
     :type primary_connection_string: str
-    :param secondary_connection_string: Required. SecondaryConnectionString of
-     the endpoint. Will be obfuscated during read
+    :param secondary_connection_string: SecondaryConnectionString of the
+     endpoint. Will be obfuscated during read.
     :type secondary_connection_string: str
     """
 
@@ -44,20 +46,19 @@ class ServiceBus(DigitalTwinsEndpointResourceProperties):
         'created_time': {'readonly': True},
         'endpoint_type': {'required': True},
         'primary_connection_string': {'required': True},
-        'secondary_connection_string': {'required': True},
     }
 
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'created_time': {'key': 'createdTime', 'type': 'iso-8601'},
-        'tags': {'key': 'tags', 'type': '{str}'},
+        'dead_letter_secret': {'key': 'deadLetterSecret', 'type': 'str'},
         'endpoint_type': {'key': 'endpointType', 'type': 'str'},
         'primary_connection_string': {'key': 'primaryConnectionString', 'type': 'str'},
         'secondary_connection_string': {'key': 'secondaryConnectionString', 'type': 'str'},
     }
 
-    def __init__(self, *, primary_connection_string: str, secondary_connection_string: str, tags=None, **kwargs) -> None:
-        super(ServiceBus, self).__init__(tags=tags, **kwargs)
+    def __init__(self, *, primary_connection_string: str, dead_letter_secret: str=None, secondary_connection_string: str=None, **kwargs) -> None:
+        super(ServiceBus, self).__init__(dead_letter_secret=dead_letter_secret, **kwargs)
         self.primary_connection_string = primary_connection_string
         self.secondary_connection_string = secondary_connection_string
         self.endpoint_type = 'ServiceBus'

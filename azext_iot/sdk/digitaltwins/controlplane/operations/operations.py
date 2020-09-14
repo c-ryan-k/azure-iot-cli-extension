@@ -22,7 +22,7 @@ class Operations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-03-01-preview".
+    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-10-31".
     """
 
     models = models
@@ -32,7 +32,7 @@ class Operations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-03-01-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
@@ -47,9 +47,9 @@ class Operations(object):
          overrides<msrest:optionsforoperations>`.
         :return: An iterator like instance of Operation
         :rtype:
-         ~digitaltwins-arm.models.OperationPaged[~digitaltwins-arm.models.Operation]
+         ~azure.mgmt.digitaltwins.models.OperationPaged[~azure.mgmt.digitaltwins.models.Operation]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         def internal_paging(next_link=None, raw=False):
 
