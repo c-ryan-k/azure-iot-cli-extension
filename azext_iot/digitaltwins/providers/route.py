@@ -25,7 +25,7 @@ class RouteProvider(DigitalTwinsProvider):
             raise CLIError(unpack_msrest_error(e))
 
     def list(self, top=None):  # top is guarded for int() in arg def
-        from azext_iot.sdk.digitaltwins.models import EventRoutesListOptions
+        from azext_iot.sdk.digitaltwins.dataplane.models import EventRoutesListOptions
 
         list_options = EventRoutesListOptions(max_item_count=top)
 
