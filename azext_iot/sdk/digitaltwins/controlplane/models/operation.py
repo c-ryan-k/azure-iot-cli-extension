@@ -22,19 +22,30 @@ class Operation(Model):
      delete}
     :vartype name: str
     :param display: Operation properties display
-    :type display: ~digitaltwins-arm.models.OperationDisplay
+    :type display: ~azure.mgmt.digitaltwins.models.OperationDisplay
+    :ivar origin: The intended executor of the operation.
+    :vartype origin: str
+    :ivar is_data_action: If the operation is a data action (for data plane
+     rbac).
+    :vartype is_data_action: bool
     """
 
     _validation = {
         'name': {'readonly': True},
+        'origin': {'readonly': True},
+        'is_data_action': {'readonly': True},
     }
 
     _attribute_map = {
         'name': {'key': 'name', 'type': 'str'},
         'display': {'key': 'display', 'type': 'OperationDisplay'},
+        'origin': {'key': 'origin', 'type': 'str'},
+        'is_data_action': {'key': 'isDataAction', 'type': 'bool'},
     }
 
     def __init__(self, **kwargs):
         super(Operation, self).__init__(**kwargs)
         self.name = None
         self.display = kwargs.get('display', None)
+        self.origin = None
+        self.is_data_action = None

@@ -13,7 +13,7 @@ from .digital_twins_endpoint_resource_properties import DigitalTwinsEndpointReso
 
 
 class EventHub(DigitalTwinsEndpointResourceProperties):
-    """properties related to eventhub.
+    """Properties related to EventHub.
 
     Variables are only populated by the server, and will be ignored when
     sending a request.
@@ -21,21 +21,23 @@ class EventHub(DigitalTwinsEndpointResourceProperties):
     All required parameters must be populated in order to send to Azure.
 
     :ivar provisioning_state: The provisioning state. Possible values include:
-     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled'
+     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled', 'Deleted',
+     'Warning', 'Suspending', 'Restoring', 'Moving', 'Disabled'
     :vartype provisioning_state: str or
-     ~digitaltwins-arm.models.EndpointProvisioningState
+     ~azure.mgmt.digitaltwins.models.EndpointProvisioningState
     :ivar created_time: Time when the Endpoint was added to
      DigitalTwinsInstance.
     :vartype created_time: datetime
-    :param tags: The resource tags.
-    :type tags: dict[str, str]
+    :param dead_letter_secret: Dead letter storage secret. Will be obfuscated
+     during read.
+    :type dead_letter_secret: str
     :param endpoint_type: Required. Constant filled by server.
     :type endpoint_type: str
     :param connection_string_primary_key: Required. PrimaryConnectionString of
-     the endpoint. Will be obfuscated during read
+     the endpoint. Will be obfuscated during read.
     :type connection_string_primary_key: str
-    :param connection_string_secondary_key: Required.
-     SecondaryConnectionString of the endpoint. Will be obfuscated during read
+    :param connection_string_secondary_key: SecondaryConnectionString of the
+     endpoint. Will be obfuscated during read.
     :type connection_string_secondary_key: str
     """
 
@@ -44,16 +46,15 @@ class EventHub(DigitalTwinsEndpointResourceProperties):
         'created_time': {'readonly': True},
         'endpoint_type': {'required': True},
         'connection_string_primary_key': {'required': True},
-        'connection_string_secondary_key': {'required': True},
     }
 
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'created_time': {'key': 'createdTime', 'type': 'iso-8601'},
-        'tags': {'key': 'tags', 'type': '{str}'},
+        'dead_letter_secret': {'key': 'deadLetterSecret', 'type': 'str'},
         'endpoint_type': {'key': 'endpointType', 'type': 'str'},
-        'connection_string_primary_key': {'key': 'connectionString-PrimaryKey', 'type': 'str'},
-        'connection_string_secondary_key': {'key': 'connectionString-SecondaryKey', 'type': 'str'},
+        'connection_string_primary_key': {'key': 'connectionStringPrimaryKey', 'type': 'str'},
+        'connection_string_secondary_key': {'key': 'connectionStringSecondaryKey', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):

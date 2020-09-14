@@ -19,21 +19,17 @@ class ProvisioningState(str, Enum):
     succeeded = "Succeeded"
     failed = "Failed"
     canceled = "Canceled"
+    deleted = "Deleted"
+    warning = "Warning"
+    suspending = "Suspending"
+    restoring = "Restoring"
+    moving = "Moving"
 
 
 class Reason(str, Enum):
 
     invalid = "Invalid"
     already_exists = "AlreadyExists"
-
-
-class IntegrationResourceState(str, Enum):
-
-    provisioning = "Provisioning"
-    deleting = "Deleting"
-    succeeded = "Succeeded"
-    failed = "Failed"
-    canceled = "Canceled"
 
 
 class EndpointProvisioningState(str, Enum):
@@ -43,3 +39,9 @@ class EndpointProvisioningState(str, Enum):
     succeeded = "Succeeded"
     failed = "Failed"
     canceled = "Canceled"
+    deleted = "Deleted"
+    warning = "Warning"
+    suspending = "Suspending"
+    restoring = "Restoring"
+    moving = "Moving"
+    disabled = "Disabled"

@@ -24,7 +24,7 @@ class DigitalTwinsOperations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-03-01-preview".
+    :ivar api_version: Version of the DigitalTwinsInstance Management API. Constant value: "2020-10-31".
     """
 
     models = models
@@ -34,7 +34,7 @@ class DigitalTwinsOperations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-03-01-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
@@ -53,17 +53,17 @@ class DigitalTwinsOperations(object):
         :param operation_config: :ref:`Operation configuration
          overrides<msrest:optionsforoperations>`.
         :return: DigitalTwinsDescription or ClientRawResponse if raw=true
-        :rtype: ~digitaltwins-arm.models.DigitalTwinsDescription or
+        :rtype: ~azure.mgmt.digitaltwins.models.DigitalTwinsDescription or
          ~msrest.pipeline.ClientRawResponse
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         # Construct URL
         url = self.get.metadata['url']
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1)
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -100,6 +100,7 @@ class DigitalTwinsOperations(object):
         return deserialized
     get.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DigitalTwins/digitalTwinsInstances/{resourceName}'}
 
+
     def _create_or_update_initial(
             self, resource_group_name, resource_name, location, tags=None, custom_headers=None, raw=False, **operation_config):
         digital_twins_create = models.DigitalTwinsDescription(location=location, tags=tags)
@@ -109,7 +110,7 @@ class DigitalTwinsOperations(object):
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=1)
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -175,11 +176,11 @@ class DigitalTwinsOperations(object):
         :return: An instance of LROPoller that returns DigitalTwinsDescription
          or ClientRawResponse<DigitalTwinsDescription> if raw==True
         :rtype:
-         ~msrestazure.azure_operation.AzureOperationPoller[~digitaltwins-arm.models.DigitalTwinsDescription]
+         ~msrestazure.azure_operation.AzureOperationPoller[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]
          or
-         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~digitaltwins-arm.models.DigitalTwinsDescription]]
+         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         raw_result = self._create_or_update_initial(
             resource_group_name=resource_group_name,
@@ -219,7 +220,7 @@ class DigitalTwinsOperations(object):
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1)
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -245,7 +246,7 @@ class DigitalTwinsOperations(object):
         request = self._client.patch(url, query_parameters, header_parameters, body_content)
         response = self._client.send(request, stream=False, **operation_config)
 
-        if response.status_code not in [200, 201]:
+        if response.status_code not in [200]:
             raise models.ErrorResponseException(self._deserialize, response)
 
         deserialized = None
@@ -278,11 +279,11 @@ class DigitalTwinsOperations(object):
         :return: An instance of LROPoller that returns DigitalTwinsDescription
          or ClientRawResponse<DigitalTwinsDescription> if raw==True
         :rtype:
-         ~msrestazure.azure_operation.AzureOperationPoller[~digitaltwins-arm.models.DigitalTwinsDescription]
+         ~msrestazure.azure_operation.AzureOperationPoller[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]
          or
-         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~digitaltwins-arm.models.DigitalTwinsDescription]]
+         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         raw_result = self._update_initial(
             resource_group_name=resource_group_name,
@@ -319,7 +320,7 @@ class DigitalTwinsOperations(object):
         path_format_arguments = {
             'subscriptionId': self._serialize.url("self.config.subscription_id", self.config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', max_length=64, min_length=1),
-            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=64, min_length=1)
+            'resourceName': self._serialize.url("resource_name", resource_name, 'str', max_length=63, min_length=3, pattern=r'^(?!-)[A-Za-z0-9-]{3,63}(?<!-)$')
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -346,9 +347,10 @@ class DigitalTwinsOperations(object):
 
         deserialized = None
 
+        if response.status_code == 200:
+            deserialized = self._deserialize('DigitalTwinsDescription', response)
         if response.status_code == 202:
-            # @digimaun - DigitalTwinsDescription -> {object}
-            deserialized = self._deserialize('{object}', response)
+            deserialized = self._deserialize('DigitalTwinsDescription', response)
 
         if raw:
             client_raw_response = ClientRawResponse(deserialized, response)
@@ -373,11 +375,11 @@ class DigitalTwinsOperations(object):
         :return: An instance of LROPoller that returns DigitalTwinsDescription
          or ClientRawResponse<DigitalTwinsDescription> if raw==True
         :rtype:
-         ~msrestazure.azure_operation.AzureOperationPoller[~digitaltwins-arm.models.DigitalTwinsDescription]
+         ~msrestazure.azure_operation.AzureOperationPoller[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]
          or
-         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~digitaltwins-arm.models.DigitalTwinsDescription]]
+         ~msrestazure.azure_operation.AzureOperationPoller[~msrest.pipeline.ClientRawResponse[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         raw_result = self._delete_initial(
             resource_group_name=resource_group_name,
@@ -387,9 +389,8 @@ class DigitalTwinsOperations(object):
             **operation_config
         )
 
-        # @digimaun - DigitalTwinsDescription -> {object}
         def get_long_running_output(response):
-            deserialized = self._deserialize('{object}', response)
+            deserialized = self._deserialize('DigitalTwinsDescription', response)
 
             if raw:
                 client_raw_response = ClientRawResponse(deserialized, response)
@@ -417,11 +418,12 @@ class DigitalTwinsOperations(object):
          overrides<msrest:optionsforoperations>`.
         :return: An iterator like instance of DigitalTwinsDescription
         :rtype:
-         ~digitaltwins-arm.models.DigitalTwinsDescriptionPaged[~digitaltwins-arm.models.DigitalTwinsDescription]
+         ~azure.mgmt.digitaltwins.models.DigitalTwinsDescriptionPaged[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         def internal_paging(next_link=None, raw=False):
+
             if not next_link:
                 # Construct URL
                 url = self.list.metadata['url']
@@ -482,9 +484,9 @@ class DigitalTwinsOperations(object):
          overrides<msrest:optionsforoperations>`.
         :return: An iterator like instance of DigitalTwinsDescription
         :rtype:
-         ~digitaltwins-arm.models.DigitalTwinsDescriptionPaged[~digitaltwins-arm.models.DigitalTwinsDescription]
+         ~azure.mgmt.digitaltwins.models.DigitalTwinsDescriptionPaged[~azure.mgmt.digitaltwins.models.DigitalTwinsDescription]
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         def internal_paging(next_link=None, raw=False):
 
@@ -549,10 +551,10 @@ class DigitalTwinsOperations(object):
         :param operation_config: :ref:`Operation configuration
          overrides<msrest:optionsforoperations>`.
         :return: CheckNameResult or ClientRawResponse if raw=true
-        :rtype: ~digitaltwins-arm.models.CheckNameResult or
+        :rtype: ~azure.mgmt.digitaltwins.models.CheckNameResult or
          ~msrest.pipeline.ClientRawResponse
         :raises:
-         :class:`ErrorResponseException<digitaltwins-arm.models.ErrorResponseException>`
+         :class:`ErrorResponseException<azure.mgmt.digitaltwins.models.ErrorResponseException>`
         """
         digital_twins_instance_check_name = models.CheckNameRequest(name=name)
 

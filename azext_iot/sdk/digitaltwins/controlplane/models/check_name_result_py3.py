@@ -18,26 +18,22 @@ class CheckNameResult(Model):
     :param name_available: Specifies a Boolean value that indicates if the
      name is available.
     :type name_available: bool
-    :param name: The name that was checked.
-    :type name: str
     :param message: Message indicating an unavailable name due to a conflict,
      or a description of the naming rules that are violated.
     :type message: str
     :param reason: Message providing the reason why the given name is invalid.
      Possible values include: 'Invalid', 'AlreadyExists'
-    :type reason: str or ~digitaltwins-arm.models.Reason
+    :type reason: str or ~azure.mgmt.digitaltwins.models.Reason
     """
 
     _attribute_map = {
         'name_available': {'key': 'nameAvailable', 'type': 'bool'},
-        'name': {'key': 'name', 'type': 'str'},
         'message': {'key': 'message', 'type': 'str'},
         'reason': {'key': 'reason', 'type': 'str'},
     }
 
-    def __init__(self, *, name_available: bool=None, name: str=None, message: str=None, reason=None, **kwargs) -> None:
+    def __init__(self, *, name_available: bool=None, message: str=None, reason=None, **kwargs) -> None:
         super(CheckNameResult, self).__init__(**kwargs)
         self.name_available = name_available
-        self.name = name
         self.message = message
         self.reason = reason

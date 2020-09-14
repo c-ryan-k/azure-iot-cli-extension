@@ -24,14 +24,16 @@ class DigitalTwinsEndpointResourceProperties(Model):
     All required parameters must be populated in order to send to Azure.
 
     :ivar provisioning_state: The provisioning state. Possible values include:
-     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled'
+     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled', 'Deleted',
+     'Warning', 'Suspending', 'Restoring', 'Moving', 'Disabled'
     :vartype provisioning_state: str or
-     ~digitaltwins-arm.models.EndpointProvisioningState
+     ~azure.mgmt.digitaltwins.models.EndpointProvisioningState
     :ivar created_time: Time when the Endpoint was added to
      DigitalTwinsInstance.
     :vartype created_time: datetime
-    :param tags: The resource tags.
-    :type tags: dict[str, str]
+    :param dead_letter_secret: Dead letter storage secret. Will be obfuscated
+     during read.
+    :type dead_letter_secret: str
     :param endpoint_type: Required. Constant filled by server.
     :type endpoint_type: str
     """
@@ -45,7 +47,7 @@ class DigitalTwinsEndpointResourceProperties(Model):
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'created_time': {'key': 'createdTime', 'type': 'iso-8601'},
-        'tags': {'key': 'tags', 'type': '{str}'},
+        'dead_letter_secret': {'key': 'deadLetterSecret', 'type': 'str'},
         'endpoint_type': {'key': 'endpointType', 'type': 'str'},
     }
 
@@ -53,9 +55,9 @@ class DigitalTwinsEndpointResourceProperties(Model):
         'endpoint_type': {'ServiceBus': 'ServiceBus', 'EventHub': 'EventHub', 'EventGrid': 'EventGrid'}
     }
 
-    def __init__(self, *, tags=None, **kwargs) -> None:
+    def __init__(self, *, dead_letter_secret: str=None, **kwargs) -> None:
         super(DigitalTwinsEndpointResourceProperties, self).__init__(**kwargs)
         self.provisioning_state = None
         self.created_time = None
-        self.tags = tags
+        self.dead_letter_secret = dead_letter_secret
         self.endpoint_type = None

@@ -13,7 +13,7 @@ from .digital_twins_endpoint_resource_properties_py3 import DigitalTwinsEndpoint
 
 
 class EventGrid(DigitalTwinsEndpointResourceProperties):
-    """properties related to eventgrid.
+    """Properties related to EventGrid.
 
     Variables are only populated by the server, and will be ignored when
     sending a request.
@@ -21,23 +21,25 @@ class EventGrid(DigitalTwinsEndpointResourceProperties):
     All required parameters must be populated in order to send to Azure.
 
     :ivar provisioning_state: The provisioning state. Possible values include:
-     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled'
+     'Provisioning', 'Deleting', 'Succeeded', 'Failed', 'Canceled', 'Deleted',
+     'Warning', 'Suspending', 'Restoring', 'Moving', 'Disabled'
     :vartype provisioning_state: str or
-     ~digitaltwins-arm.models.EndpointProvisioningState
+     ~azure.mgmt.digitaltwins.models.EndpointProvisioningState
     :ivar created_time: Time when the Endpoint was added to
      DigitalTwinsInstance.
     :vartype created_time: datetime
-    :param tags: The resource tags.
-    :type tags: dict[str, str]
+    :param dead_letter_secret: Dead letter storage secret. Will be obfuscated
+     during read.
+    :type dead_letter_secret: str
     :param endpoint_type: Required. Constant filled by server.
     :type endpoint_type: str
-    :param topic_endpoint: EventGrid Topic Endpoint
+    :param topic_endpoint: Required. EventGrid Topic Endpoint
     :type topic_endpoint: str
     :param access_key1: Required. EventGrid secondary accesskey. Will be
-     obfuscated during read
+     obfuscated during read.
     :type access_key1: str
-    :param access_key2: Required. EventGrid secondary accesskey. Will be
-     obfuscated during read
+    :param access_key2: EventGrid secondary accesskey. Will be obfuscated
+     during read.
     :type access_key2: str
     """
 
@@ -45,22 +47,22 @@ class EventGrid(DigitalTwinsEndpointResourceProperties):
         'provisioning_state': {'readonly': True},
         'created_time': {'readonly': True},
         'endpoint_type': {'required': True},
+        'topic_endpoint': {'required': True},
         'access_key1': {'required': True},
-        'access_key2': {'required': True},
     }
 
     _attribute_map = {
         'provisioning_state': {'key': 'provisioningState', 'type': 'str'},
         'created_time': {'key': 'createdTime', 'type': 'iso-8601'},
-        'tags': {'key': 'tags', 'type': '{str}'},
+        'dead_letter_secret': {'key': 'deadLetterSecret', 'type': 'str'},
         'endpoint_type': {'key': 'endpointType', 'type': 'str'},
         'topic_endpoint': {'key': 'TopicEndpoint', 'type': 'str'},
         'access_key1': {'key': 'accessKey1', 'type': 'str'},
         'access_key2': {'key': 'accessKey2', 'type': 'str'},
     }
 
-    def __init__(self, *, access_key1: str, access_key2: str, tags=None, topic_endpoint: str=None, **kwargs) -> None:
-        super(EventGrid, self).__init__(tags=tags, **kwargs)
+    def __init__(self, *, topic_endpoint: str, access_key1: str, dead_letter_secret: str=None, access_key2: str=None, **kwargs) -> None:
+        super(EventGrid, self).__init__(dead_letter_secret=dead_letter_secret, **kwargs)
         self.topic_endpoint = topic_endpoint
         self.access_key1 = access_key1
         self.access_key2 = access_key2

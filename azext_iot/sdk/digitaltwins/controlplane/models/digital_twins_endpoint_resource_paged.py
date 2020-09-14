@@ -14,13 +14,12 @@ from msrest.paging import Paged
 
 class DigitalTwinsEndpointResourcePaged(Paged):
     """
-    A paging container for iterating over a list of :class:`DigitalTwinsEndpointResource <digitaltwins-arm.models.DigitalTwinsEndpointResource>` object
+    A paging container for iterating over a list of :class:`DigitalTwinsEndpointResource <azure.mgmt.digitaltwins.models.DigitalTwinsEndpointResource>` object
     """
 
-    # @digimaun - current_page: [DigitalTwinsEndpointResource] -> {object]
     _attribute_map = {
         'next_link': {'key': 'nextLink', 'type': 'str'},
-        'current_page': {'key': 'value', 'type': '[object]'}
+        'current_page': {'key': 'value', 'type': '[DigitalTwinsEndpointResource]'}
     }
 
     def __init__(self, *args, **kwargs):
