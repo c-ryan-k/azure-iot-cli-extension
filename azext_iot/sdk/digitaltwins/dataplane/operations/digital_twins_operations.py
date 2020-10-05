@@ -22,7 +22,7 @@ class DigitalTwinsOperations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: The requested API version. Constant value: "2020-05-31-preview".
+    :ivar api_version: The API version to use for the request. Constant value: "2020-10-31".
     """
 
     models = models
@@ -32,20 +32,27 @@ class DigitalTwinsOperations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-05-31-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
     def get_by_id(
-            self, id, custom_headers=None, raw=False, **operation_config):
+            self, id, digital_twins_get_by_id_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves a digital twin.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
+        :param digital_twins_get_by_id_options: Additional parameters for the
+         operation
+        :type digital_twins_get_by_id_options:
+         ~digitaltwins.models.DigitalTwinsGetByIdOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -56,6 +63,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_get_by_id_options is not None:
+            traceparent = digital_twins_get_by_id_options.traceparent
+        tracestate = None
+        if digital_twins_get_by_id_options is not None:
+            tracestate = digital_twins_get_by_id_options.tracestate
+
         # Construct URL
         url = self.get_by_id.metadata['url']
         path_format_arguments = {
@@ -76,6 +90,10 @@ class DigitalTwinsOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
@@ -102,23 +120,31 @@ class DigitalTwinsOperations(object):
     get_by_id.metadata = {'url': '/digitaltwins/{id}'}
 
     def add(
-            self, id, twin, if_none_match=None, custom_headers=None, raw=False, **operation_config):
+            self, twin, id, digital_twins_add_options=None, custom_headers=None, raw=False, **operation_config):
         """Adds or replaces a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        412 (Precondition Failed): The model is decommissioned or the digital
-        twin already exists (when using If-None-Match: *).
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or payload is invalid.
+        * ModelDecommissioned - The model for the digital twin is
+        decommissioned.
+        * TwinLimitReached - The maximum number of digital twins allowed has
+        been reached.
+        * ValidationFailed - The digital twin payload is not valid.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
-        :param id: The id of the digital twin. The id is unique within the
-         service and case sensitive.
-        :type id: str
         :param twin: The digital twin instance being added. If provided, the
          $dtId property is ignored.
         :type twin: object
-        :param if_none_match: Only perform the operation if the entity does
-         not already exist. Possible values include: '*'
-        :type if_none_match: str
+        :param id: The id of the digital twin. The id is unique within the
+         service and case sensitive.
+        :type id: str
+        :param digital_twins_add_options: Additional parameters for the
+         operation
+        :type digital_twins_add_options:
+         ~digitaltwins.models.DigitalTwinsAddOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -129,6 +155,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_add_options is not None:
+            traceparent = digital_twins_add_options.traceparent
+        tracestate = None
+        if digital_twins_add_options is not None:
+            tracestate = digital_twins_add_options.tracestate
+        if_none_match = None
+        if digital_twins_add_options is not None:
+            if_none_match = digital_twins_add_options.if_none_match
+
         # Construct URL
         url = self.add.metadata['url']
         path_format_arguments = {
@@ -148,10 +184,14 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_none_match is not None:
-            header_parameters['If-None-Match'] = self._serialize.header("if_none_match", if_none_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_none_match is not None:
+            header_parameters['If-None-Match'] = self._serialize.header("if_none_match", if_none_match, 'str')
 
         # Construct body
         body_content = self._serialize.body(twin, 'object')
@@ -181,20 +221,27 @@ class DigitalTwinsOperations(object):
     add.metadata = {'url': '/digitaltwins/{id}'}
 
     def delete(
-            self, id, if_match=None, custom_headers=None, raw=False, **operation_config):
+            self, id, digital_twins_delete_options=None, custom_headers=None, raw=False, **operation_config):
         """Deletes a digital twin. All relationships referencing the digital twin
         must already be deleted.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id is invalid.
+        * RelationshipsNotDeleted - The digital twin contains relationships.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
-        :param if_match: Only perform the operation if the entity's etag
-         matches one of the etags provided or * is provided.
-        :type if_match: str
+        :param digital_twins_delete_options: Additional parameters for the
+         operation
+        :type digital_twins_delete_options:
+         ~digitaltwins.models.DigitalTwinsDeleteOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -205,6 +252,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_delete_options is not None:
+            traceparent = digital_twins_delete_options.traceparent
+        tracestate = None
+        if digital_twins_delete_options is not None:
+            tracestate = digital_twins_delete_options.tracestate
+        if_match = None
+        if digital_twins_delete_options is not None:
+            if_match = digital_twins_delete_options.if_match
+
         # Construct URL
         url = self.delete.metadata['url']
         path_format_arguments = {
@@ -222,10 +279,14 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_match is not None:
-            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_match is not None:
+            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)
@@ -240,23 +301,32 @@ class DigitalTwinsOperations(object):
     delete.metadata = {'url': '/digitaltwins/{id}'}
 
     def update(
-            self, id, patch_document, if_match=None, custom_headers=None, raw=False, **operation_config):
+            self, patch_document, id, digital_twins_update_options=None, custom_headers=None, raw=False, **operation_config):
         """Updates a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or payload is invalid.
+        * JsonPatchInvalid - The JSON Patch provided is invalid.
+        * ValidationFailed - Applying the patch results in an invalid digital
+        twin.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
-        :param id: The id of the digital twin. The id is unique within the
-         service and case sensitive.
-        :type id: str
         :param patch_document: An update specification described by JSON
          Patch. Updates to property values and $model elements may happen in
          the same request. Operations are limited to add, replace and remove.
         :type patch_document: list[object]
-        :param if_match: Only perform the operation if the entity's etag
-         matches one of the etags provided or * is provided.
-        :type if_match: str
+        :param id: The id of the digital twin. The id is unique within the
+         service and case sensitive.
+        :type id: str
+        :param digital_twins_update_options: Additional parameters for the
+         operation
+        :type digital_twins_update_options:
+         ~digitaltwins.models.DigitalTwinsUpdateOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -267,6 +337,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_update_options is not None:
+            traceparent = digital_twins_update_options.traceparent
+        tracestate = None
+        if digital_twins_update_options is not None:
+            tracestate = digital_twins_update_options.tracestate
+        if_match = None
+        if digital_twins_update_options is not None:
+            if_match = digital_twins_update_options.if_match
+
         # Construct URL
         url = self.update.metadata['url']
         path_format_arguments = {
@@ -285,10 +365,14 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_match is not None:
-            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_match is not None:
+            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
 
         # Construct body
         body_content = self._serialize.body(patch_document, '[object]')
@@ -309,12 +393,15 @@ class DigitalTwinsOperations(object):
     update.metadata = {'url': '/digitaltwins/{id}'}
 
     def get_relationship_by_id(
-            self, id, relationship_id, custom_headers=None, raw=False, **operation_config):
+            self, id, relationship_id, digital_twins_get_relationship_by_id_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves a relationship between two digital twins.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is either no digital twin or relationship with
-        the provided id.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or relationship id is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * RelationshipNotFound - The relationship was not found.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
@@ -322,6 +409,10 @@ class DigitalTwinsOperations(object):
         :param relationship_id: The id of the relationship. The id is unique
          within the digital twin and case sensitive.
         :type relationship_id: str
+        :param digital_twins_get_relationship_by_id_options: Additional
+         parameters for the operation
+        :type digital_twins_get_relationship_by_id_options:
+         ~digitaltwins.models.DigitalTwinsGetRelationshipByIdOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -332,6 +423,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_get_relationship_by_id_options is not None:
+            traceparent = digital_twins_get_relationship_by_id_options.traceparent
+        tracestate = None
+        if digital_twins_get_relationship_by_id_options is not None:
+            tracestate = digital_twins_get_relationship_by_id_options.tracestate
+
         # Construct URL
         url = self.get_relationship_by_id.metadata['url']
         path_format_arguments = {
@@ -353,6 +451,10 @@ class DigitalTwinsOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
@@ -379,26 +481,37 @@ class DigitalTwinsOperations(object):
     get_relationship_by_id.metadata = {'url': '/digitaltwins/{id}/relationships/{relationshipId}'}
 
     def add_relationship(
-            self, id, relationship_id, relationship=None, if_none_match=None, custom_headers=None, raw=False, **operation_config):
+            self, relationship, id, relationship_id, digital_twins_add_relationship_options=None, custom_headers=None, raw=False, **operation_config):
         """Adds a relationship between two digital twins.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is either no digital twin, target digital twin,
-        or relationship with the provided id.
-        409 (Conflict): A relationship with the provided id already exists.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id, relationship id, or payload is
+        invalid.
+        * InvalidRelationship - The relationship is invalid.
+        * OperationNotAllowed - The relationship cannot connect to the same
+        digital twin.
+        * ValidationFailed - The relationship content is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * TargetTwinNotFound - The digital twin target of the relationship was
+        not found.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
+        :param relationship: The data for the relationship.
+        :type relationship: object
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param relationship_id: The id of the relationship. The id is unique
          within the digital twin and case sensitive.
         :type relationship_id: str
-        :param relationship: The data for the relationship.
-        :type relationship: object
-        :param if_none_match: Only perform the operation if the entity does
-         not already exist. Possible values include: '*'
-        :type if_none_match: str
+        :param digital_twins_add_relationship_options: Additional parameters
+         for the operation
+        :type digital_twins_add_relationship_options:
+         ~digitaltwins.models.DigitalTwinsAddRelationshipOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -409,6 +522,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_add_relationship_options is not None:
+            traceparent = digital_twins_add_relationship_options.traceparent
+        tracestate = None
+        if digital_twins_add_relationship_options is not None:
+            tracestate = digital_twins_add_relationship_options.tracestate
+        if_none_match = None
+        if digital_twins_add_relationship_options is not None:
+            if_none_match = digital_twins_add_relationship_options.if_none_match
+
         # Construct URL
         url = self.add_relationship.metadata['url']
         path_format_arguments = {
@@ -429,16 +552,17 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_none_match is not None:
-            header_parameters['If-None-Match'] = self._serialize.header("if_none_match", if_none_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_none_match is not None:
+            header_parameters['If-None-Match'] = self._serialize.header("if_none_match", if_none_match, 'str')
 
         # Construct body
-        if relationship is not None:
-            body_content = self._serialize.body(relationship, 'object')
-        else:
-            body_content = None
+        body_content = self._serialize.body(relationship, 'object')
 
         # Construct and send request
         request = self._client.put(url, query_parameters, header_parameters, body_content)
@@ -465,12 +589,18 @@ class DigitalTwinsOperations(object):
     add_relationship.metadata = {'url': '/digitaltwins/{id}/relationships/{relationshipId}'}
 
     def delete_relationship(
-            self, id, relationship_id, if_match=None, custom_headers=None, raw=False, **operation_config):
+            self, id, relationship_id, digital_twins_delete_relationship_options=None, custom_headers=None, raw=False, **operation_config):
         """Deletes a relationship between two digital twins.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is either no digital twin or relationship with
-        the provided id.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or relationship id is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * RelationshipNotFound - The relationship was not found.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
@@ -478,9 +608,10 @@ class DigitalTwinsOperations(object):
         :param relationship_id: The id of the relationship. The id is unique
          within the digital twin and case sensitive.
         :type relationship_id: str
-        :param if_match: Only perform the operation if the entity's etag
-         matches one of the etags provided or * is provided.
-        :type if_match: str
+        :param digital_twins_delete_relationship_options: Additional
+         parameters for the operation
+        :type digital_twins_delete_relationship_options:
+         ~digitaltwins.models.DigitalTwinsDeleteRelationshipOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -491,6 +622,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_delete_relationship_options is not None:
+            traceparent = digital_twins_delete_relationship_options.traceparent
+        tracestate = None
+        if digital_twins_delete_relationship_options is not None:
+            tracestate = digital_twins_delete_relationship_options.tracestate
+        if_match = None
+        if digital_twins_delete_relationship_options is not None:
+            if_match = digital_twins_delete_relationship_options.if_match
+
         # Construct URL
         url = self.delete_relationship.metadata['url']
         path_format_arguments = {
@@ -509,10 +650,14 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_match is not None:
-            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_match is not None:
+            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)
@@ -527,26 +672,37 @@ class DigitalTwinsOperations(object):
     delete_relationship.metadata = {'url': '/digitaltwins/{id}/relationships/{relationshipId}'}
 
     def update_relationship(
-            self, id, relationship_id, patch_document=None, if_match=None, custom_headers=None, raw=False, **operation_config):
+            self, patch_document, id, relationship_id, digital_twins_update_relationship_options=None, custom_headers=None, raw=False, **operation_config):
         """Updates the properties on a relationship between two digital twins.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is either no digital twin or relationship with
-        the provided id.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or relationship id is invalid.
+        * InvalidRelationship - The relationship is invalid.
+        * JsonPatchInvalid - The JSON Patch provided is invalid.
+        * ValidationFailed - The relationship content is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * RelationshipNotFound - The relationship was not found.
+        * 409 Conflict
+        * RelationshipAlreadyExists - The relationship already exists.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
+        :param patch_document: JSON Patch description of the update to the
+         relationship properties.
+        :type patch_document: list[object]
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param relationship_id: The id of the relationship. The id is unique
          within the digital twin and case sensitive.
         :type relationship_id: str
-        :param patch_document: JSON Patch description of the update to the
-         relationship properties.
-        :type patch_document: list[object]
-        :param if_match: Only perform the operation if the entity's etag
-         matches one of the etags provided or * is provided.
-        :type if_match: str
+        :param digital_twins_update_relationship_options: Additional
+         parameters for the operation
+        :type digital_twins_update_relationship_options:
+         ~digitaltwins.models.DigitalTwinsUpdateRelationshipOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -557,6 +713,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_update_relationship_options is not None:
+            traceparent = digital_twins_update_relationship_options.traceparent
+        tracestate = None
+        if digital_twins_update_relationship_options is not None:
+            tracestate = digital_twins_update_relationship_options.tracestate
+        if_match = None
+        if digital_twins_update_relationship_options is not None:
+            if_match = digital_twins_update_relationship_options.if_match
+
         # Construct URL
         url = self.update_relationship.metadata['url']
         path_format_arguments = {
@@ -576,16 +742,17 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_match is not None:
-            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_match is not None:
+            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
 
         # Construct body
-        if patch_document is not None:
-            body_content = self._serialize.body(patch_document, '[object]')
-        else:
-            body_content = None
+        body_content = self._serialize.body(patch_document, '[object]')
 
         # Construct and send request
         request = self._client.patch(url, query_parameters, header_parameters, body_content)
@@ -603,18 +770,24 @@ class DigitalTwinsOperations(object):
     update_relationship.metadata = {'url': '/digitaltwins/{id}/relationships/{relationshipId}'}
 
     def list_relationships(
-            self, id, relationship_name=None, custom_headers=None, raw=False, **operation_config):
+            self, id, relationship_name=None, digital_twins_list_relationships_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves the relationships from a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param relationship_name: The name of the relationship.
         :type relationship_name: str
+        :param digital_twins_list_relationships_options: Additional parameters
+         for the operation
+        :type digital_twins_list_relationships_options:
+         ~digitaltwins.models.DigitalTwinsListRelationshipsOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -625,6 +798,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_list_relationships_options is not None:
+            traceparent = digital_twins_list_relationships_options.traceparent
+        tracestate = None
+        if digital_twins_list_relationships_options is not None:
+            tracestate = digital_twins_list_relationships_options.tracestate
+
         def internal_paging(next_link=None, raw=False):
 
             if not next_link:
@@ -654,6 +834,10 @@ class DigitalTwinsOperations(object):
                 header_parameters.update(custom_headers)
             if self.config.accept_language is not None:
                 header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+            if traceparent is not None:
+                header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+            if tracestate is not None:
+                header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
             # Construct and send request
             request = self._client.get(url, query_parameters, header_parameters)
@@ -676,16 +860,22 @@ class DigitalTwinsOperations(object):
     list_relationships.metadata = {'url': '/digitaltwins/{id}/relationships'}
 
     def list_incoming_relationships(
-            self, id, custom_headers=None, raw=False, **operation_config):
+            self, id, digital_twins_list_incoming_relationships_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves all incoming relationship for a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
+        :param digital_twins_list_incoming_relationships_options: Additional
+         parameters for the operation
+        :type digital_twins_list_incoming_relationships_options:
+         ~digitaltwins.models.DigitalTwinsListIncomingRelationshipsOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -697,6 +887,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_list_incoming_relationships_options is not None:
+            traceparent = digital_twins_list_incoming_relationships_options.traceparent
+        tracestate = None
+        if digital_twins_list_incoming_relationships_options is not None:
+            tracestate = digital_twins_list_incoming_relationships_options.tracestate
+
         def internal_paging(next_link=None, raw=False):
 
             if not next_link:
@@ -724,6 +921,10 @@ class DigitalTwinsOperations(object):
                 header_parameters.update(custom_headers)
             if self.config.accept_language is not None:
                 header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+            if traceparent is not None:
+                header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+            if tracestate is not None:
+                header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
             # Construct and send request
             request = self._client.get(url, query_parameters, header_parameters)
@@ -746,25 +947,32 @@ class DigitalTwinsOperations(object):
     list_incoming_relationships.metadata = {'url': '/digitaltwins/{id}/incomingrelationships'}
 
     def send_telemetry(
-            self, id, telemetry, dt_id, dt_timestamp=None, custom_headers=None, raw=False, **operation_config):
+            self, telemetry, id, message_id, telemetry_source_time=None, digital_twins_send_telemetry_options=None, custom_headers=None, raw=False, **operation_config):
         """Sends telemetry on behalf of a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is no digital twin with the provided id.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or message id is invalid.
+        * ValidationFailed - The telemetry content is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
 
-        :param id: The id of the digital twin. The id is unique within the
-         service and case sensitive.
-        :type id: str
         :param telemetry: The telemetry measurements to send from the digital
          twin.
         :type telemetry: object
-        :param dt_id: A unique message identifier (in the scope of the digital
-         twin id) that is commonly used for de-duplicating messages.
-        :type dt_id: str
-        :param dt_timestamp: An RFC 3339 timestamp that identifies the time
-         the telemetry was measured.
-        :type dt_timestamp: str
+        :param id: The id of the digital twin. The id is unique within the
+         service and case sensitive.
+        :type id: str
+        :param message_id: A unique message identifier (in the scope of the
+         digital twin id) that is commonly used for de-duplicating messages.
+        :type message_id: str
+        :param telemetry_source_time: An RFC 3339 timestamp that identifies
+         the time the telemetry was measured.
+        :type telemetry_source_time: str
+        :param digital_twins_send_telemetry_options: Additional parameters for
+         the operation
+        :type digital_twins_send_telemetry_options:
+         ~digitaltwins.models.DigitalTwinsSendTelemetryOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -775,6 +983,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_send_telemetry_options is not None:
+            traceparent = digital_twins_send_telemetry_options.traceparent
+        tracestate = None
+        if digital_twins_send_telemetry_options is not None:
+            tracestate = digital_twins_send_telemetry_options.tracestate
+
         # Construct URL
         url = self.send_telemetry.metadata['url']
         path_format_arguments = {
@@ -784,8 +999,6 @@ class DigitalTwinsOperations(object):
 
         # Construct parameters
         query_parameters = {}
-
-        # @digimaun - add api-version query parameter
         query_parameters['api-version'] = self._serialize.query("self.api_version", self.api_version, 'str')
 
         # Construct headers
@@ -795,11 +1008,15 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        header_parameters['dt-id'] = self._serialize.header("dt_id", dt_id, 'str')
-        if dt_timestamp is not None:
-            header_parameters['dt-timestamp'] = self._serialize.header("dt_timestamp", dt_timestamp, 'str')
+        header_parameters['Message-Id'] = self._serialize.header("message_id", message_id, 'str')
+        if telemetry_source_time is not None:
+            header_parameters['Telemetry-Source-Time'] = self._serialize.header("telemetry_source_time", telemetry_source_time, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct body
         body_content = self._serialize.body(telemetry, 'object')
@@ -817,28 +1034,36 @@ class DigitalTwinsOperations(object):
     send_telemetry.metadata = {'url': '/digitaltwins/{id}/telemetry'}
 
     def send_component_telemetry(
-            self, id, component_path, telemetry, dt_id, dt_timestamp=None, custom_headers=None, raw=False, **operation_config):
+            self, telemetry, id, component_path, message_id, telemetry_source_time=None, digital_twins_send_component_telemetry_options=None, custom_headers=None, raw=False, **operation_config):
         """Sends telemetry on behalf of a component in a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is either no digital twin with the provided id
-        or the component path is invalid.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id, message id, or component path
+        is invalid.
+        * ValidationFailed - The telemetry content is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * ComponentNotFound - The component path was not found.
 
+        :param telemetry: The telemetry measurements to send from the digital
+         twin's component.
+        :type telemetry: object
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param component_path: The name of the DTDL component.
         :type component_path: str
-        :param telemetry: The telemetry measurements to send from the digital
-         twin's component.
-        :type telemetry: object
-        :param dt_id: A unique message identifier (in the scope of the digital
-         twin id) that is commonly used for de-duplicating messages.
-        :type dt_id: str
-        :param dt_timestamp: An RFC 3339 timestamp that identifies the time
-         the telemetry was measured.
-        :type dt_timestamp: str
+        :param message_id: A unique message identifier (in the scope of the
+         digital twin id) that is commonly used for de-duplicating messages.
+        :type message_id: str
+        :param telemetry_source_time: An RFC 3339 timestamp that identifies
+         the time the telemetry was measured.
+        :type telemetry_source_time: str
+        :param digital_twins_send_component_telemetry_options: Additional
+         parameters for the operation
+        :type digital_twins_send_component_telemetry_options:
+         ~digitaltwins.models.DigitalTwinsSendComponentTelemetryOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -849,6 +1074,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_send_component_telemetry_options is not None:
+            traceparent = digital_twins_send_component_telemetry_options.traceparent
+        tracestate = None
+        if digital_twins_send_component_telemetry_options is not None:
+            tracestate = digital_twins_send_component_telemetry_options.tracestate
+
         # Construct URL
         url = self.send_component_telemetry.metadata['url']
         path_format_arguments = {
@@ -859,8 +1091,6 @@ class DigitalTwinsOperations(object):
 
         # Construct parameters
         query_parameters = {}
-
-        # @digimaun - add api-version query parameter
         query_parameters['api-version'] = self._serialize.query("self.api_version", self.api_version, 'str')
 
         # Construct headers
@@ -870,11 +1100,15 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        header_parameters['dt-id'] = self._serialize.header("dt_id", dt_id, 'str')
-        if dt_timestamp is not None:
-            header_parameters['dt-timestamp'] = self._serialize.header("dt_timestamp", dt_timestamp, 'str')
+        header_parameters['Message-Id'] = self._serialize.header("message_id", message_id, 'str')
+        if telemetry_source_time is not None:
+            header_parameters['Telemetry-Source-Time'] = self._serialize.header("telemetry_source_time", telemetry_source_time, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct body
         body_content = self._serialize.body(telemetry, 'object')
@@ -892,18 +1126,25 @@ class DigitalTwinsOperations(object):
     send_component_telemetry.metadata = {'url': '/digitaltwins/{id}/components/{componentPath}/telemetry'}
 
     def get_component(
-            self, id, component_path, custom_headers=None, raw=False, **operation_config):
+            self, id, component_path, digital_twins_get_component_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves a component from a digital twin.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is either no digital twin with the provided id
-        or the component path is invalid.
+        * 200 OK
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id or component path is invalid.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * ComponentNotFound - The component path was not found.
 
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param component_path: The name of the DTDL component.
         :type component_path: str
+        :param digital_twins_get_component_options: Additional parameters for
+         the operation
+        :type digital_twins_get_component_options:
+         ~digitaltwins.models.DigitalTwinsGetComponentOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -914,6 +1155,13 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_get_component_options is not None:
+            traceparent = digital_twins_get_component_options.traceparent
+        tracestate = None
+        if digital_twins_get_component_options is not None:
+            tracestate = digital_twins_get_component_options.tracestate
+
         # Construct URL
         url = self.get_component.metadata['url']
         path_format_arguments = {
@@ -935,6 +1183,10 @@ class DigitalTwinsOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
@@ -961,26 +1213,35 @@ class DigitalTwinsOperations(object):
     get_component.metadata = {'url': '/digitaltwins/{id}/components/{componentPath}'}
 
     def update_component(
-            self, id, component_path, patch_document=None, if_match=None, custom_headers=None, raw=False, **operation_config):
+            self, patch_document, id, component_path, digital_twins_update_component_options=None, custom_headers=None, raw=False, **operation_config):
         """Updates a component on a digital twin.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
-        404 (Not Found): There is either no digital twin with the provided id
-        or the component path is invalid.
+        * 204 No Content
+        * 400 Bad Request
+        * InvalidArgument - The digital twin id, component path, or payload is
+        invalid.
+        * JsonPatchInvalid - The JSON Patch provided is invalid.
+        * ValidationFailed - Applying the patch results in an invalid digital
+        twin.
+        * 404 Not Found
+        * DigitalTwinNotFound - The digital twin was not found.
+        * 412 Precondition Failed
+        * PreconditionFailed - The precondition check (If-Match or
+        If-None-Match) failed.
 
+        :param patch_document: An update specification described by JSON
+         Patch. Updates to property values and $model elements may happen in
+         the same request. Operations are limited to add, replace and remove.
+        :type patch_document: list[object]
         :param id: The id of the digital twin. The id is unique within the
          service and case sensitive.
         :type id: str
         :param component_path: The name of the DTDL component.
         :type component_path: str
-        :param patch_document: An update specification described by JSON
-         Patch. Updates to property values and $model elements may happen in
-         the same request. Operations are limited to add, replace and remove.
-        :type patch_document: list[object]
-        :param if_match: Only perform the operation if the entity's etag
-         matches one of the etags provided or * is provided.
-        :type if_match: str
+        :param digital_twins_update_component_options: Additional parameters
+         for the operation
+        :type digital_twins_update_component_options:
+         ~digitaltwins.models.DigitalTwinsUpdateComponentOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -991,6 +1252,16 @@ class DigitalTwinsOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if digital_twins_update_component_options is not None:
+            traceparent = digital_twins_update_component_options.traceparent
+        tracestate = None
+        if digital_twins_update_component_options is not None:
+            tracestate = digital_twins_update_component_options.tracestate
+        if_match = None
+        if digital_twins_update_component_options is not None:
+            if_match = digital_twins_update_component_options.if_match
+
         # Construct URL
         url = self.update_component.metadata['url']
         path_format_arguments = {
@@ -1010,16 +1281,17 @@ class DigitalTwinsOperations(object):
             header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
         if custom_headers:
             header_parameters.update(custom_headers)
-        if if_match is not None:
-            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if if_match is not None:
+            header_parameters['If-Match'] = self._serialize.header("if_match", if_match, 'str')
 
         # Construct body
-        if patch_document is not None:
-            body_content = self._serialize.body(patch_document, '[object]')
-        else:
-            body_content = None
+        body_content = self._serialize.body(patch_document, '[object]')
 
         # Construct and send request
         request = self._client.patch(url, query_parameters, header_parameters, body_content)

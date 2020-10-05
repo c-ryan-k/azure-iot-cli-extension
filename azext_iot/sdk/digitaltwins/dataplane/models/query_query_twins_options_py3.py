@@ -12,8 +12,8 @@
 from msrest.serialization import Model
 
 
-class DigitalTwinModelsListOptions(Model):
-    """Additional parameters for list operation.
+class QueryQueryTwinsOptions(Model):
+    """Additional parameters for query_twins operation.
 
     :param traceparent: Identifies the request in a distributed tracing
      system.
@@ -32,8 +32,8 @@ class DigitalTwinModelsListOptions(Model):
         'max_items_per_page': {'key': '', 'type': 'int'},
     }
 
-    def __init__(self, **kwargs):
-        super(DigitalTwinModelsListOptions, self).__init__(**kwargs)
-        self.traceparent = kwargs.get('traceparent', None)
-        self.tracestate = kwargs.get('tracestate', None)
-        self.max_items_per_page = kwargs.get('max_items_per_page', None)
+    def __init__(self, *, traceparent: str=None, tracestate: str=None, max_items_per_page: int=None, **kwargs) -> None:
+        super(QueryQueryTwinsOptions, self).__init__(**kwargs)
+        self.traceparent = traceparent
+        self.tracestate = tracestate
+        self.max_items_per_page = max_items_per_page

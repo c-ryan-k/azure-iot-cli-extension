@@ -22,7 +22,7 @@ class QueryOperations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: The requested API version. Constant value: "2020-05-31-preview".
+    :ivar api_version: The API version to use for the request. Constant value: "2020-10-31".
     """
 
     models = models
@@ -32,17 +32,21 @@ class QueryOperations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-05-31-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
     def query_twins(
-            self, query=None, continuation_token=None, custom_headers=None, raw=False, **operation_config):
+            self, query=None, continuation_token=None, query_query_twins_options=None, custom_headers=None, raw=False, **operation_config):
         """Executes a query that allows traversing relationships and filtering by
         property values.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
+        * 200 OK
+        * 400 Bad Request
+        * BadRequest - The continuation token is invalid.
+        * SqlQueryError - The query contains some errors.
+        * 429 Too Many Requests
+        * QuotaReachedError - The maximum query rate limit has been reached.
 
         :param query: The query to execute. This value is ignored if a
          continuation token is provided.
@@ -50,6 +54,10 @@ class QueryOperations(object):
         :param continuation_token: A token which is used to retrieve the next
          set of results from a previous query.
         :type continuation_token: str
+        :param query_query_twins_options: Additional parameters for the
+         operation
+        :type query_query_twins_options:
+         ~digitaltwins.models.QueryQueryTwinsOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -61,6 +69,15 @@ class QueryOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if query_query_twins_options is not None:
+            traceparent = query_query_twins_options.traceparent
+        tracestate = None
+        if query_query_twins_options is not None:
+            tracestate = query_query_twins_options.tracestate
+        max_items_per_page = None
+        if query_query_twins_options is not None:
+            max_items_per_page = query_query_twins_options.max_items_per_page
         query_specification = models.QuerySpecification(query=query, continuation_token=continuation_token)
 
         # Construct URL
@@ -80,6 +97,12 @@ class QueryOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+        if max_items_per_page is not None:
+            header_parameters['max-items-per-page'] = self._serialize.header("max_items_per_page", max_items_per_page, 'int')
 
         # Construct body
         body_content = self._serialize.body(query_specification, 'QuerySpecification')
@@ -97,7 +120,7 @@ class QueryOperations(object):
         if response.status_code == 200:
             deserialized = self._deserialize('QueryResult', response)
             header_dict = {
-                'query-charge': 'str',
+                'query-charge': 'float',
             }
 
         if raw:

@@ -22,7 +22,7 @@ class EventRoutesOperations(object):
     :param config: Configuration of service client.
     :param serializer: An object model serializer.
     :param deserializer: An object model deserializer.
-    :ivar api_version: The requested API version. Constant value: "2020-05-31-preview".
+    :ivar api_version: The API version to use for the request. Constant value: "2020-10-31".
     """
 
     models = models
@@ -32,7 +32,7 @@ class EventRoutesOperations(object):
         self._client = client
         self._serialize = serializer
         self._deserialize = deserializer
-        self.api_version = "2020-05-31-preview"
+        self.api_version = "2020-10-31"
 
         self.config = config
 
@@ -40,8 +40,7 @@ class EventRoutesOperations(object):
             self, event_routes_list_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves all event routes.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
+        * 200 OK.
 
         :param event_routes_list_options: Additional parameters for the
          operation
@@ -58,9 +57,15 @@ class EventRoutesOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
-        max_item_count = None
+        traceparent = None
         if event_routes_list_options is not None:
-            max_item_count = event_routes_list_options.max_item_count
+            traceparent = event_routes_list_options.traceparent
+        tracestate = None
+        if event_routes_list_options is not None:
+            tracestate = event_routes_list_options.tracestate
+        max_items_per_page = None
+        if event_routes_list_options is not None:
+            max_items_per_page = event_routes_list_options.max_items_per_page
 
         def internal_paging(next_link=None, raw=False):
 
@@ -85,8 +90,12 @@ class EventRoutesOperations(object):
                 header_parameters.update(custom_headers)
             if self.config.accept_language is not None:
                 header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
-            if max_item_count is not None:
-                header_parameters['x-ms-max-item-count'] = self._serialize.header("max_item_count", max_item_count, 'int')
+            if traceparent is not None:
+                header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+            if tracestate is not None:
+                header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
+            if max_items_per_page is not None:
+                header_parameters['max-items-per-page'] = self._serialize.header("max_items_per_page", max_items_per_page, 'int')
 
             # Construct and send request
             request = self._client.get(url, query_parameters, header_parameters)
@@ -109,15 +118,20 @@ class EventRoutesOperations(object):
     list.metadata = {'url': '/eventroutes'}
 
     def get_by_id(
-            self, id, custom_headers=None, raw=False, **operation_config):
+            self, id, event_routes_get_by_id_options=None, custom_headers=None, raw=False, **operation_config):
         """Retrieves an event route.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is no event route with the provided id.
+        * 200 OK
+        * 404 Not Found
+        * EventRouteNotFound - The event route was not found.
 
         :param id: The id for an event route. The id is unique within event
          routes and case sensitive.
         :type id: str
+        :param event_routes_get_by_id_options: Additional parameters for the
+         operation
+        :type event_routes_get_by_id_options:
+         ~digitaltwins.models.EventRoutesGetByIdOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -129,6 +143,13 @@ class EventRoutesOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if event_routes_get_by_id_options is not None:
+            traceparent = event_routes_get_by_id_options.traceparent
+        tracestate = None
+        if event_routes_get_by_id_options is not None:
+            tracestate = event_routes_get_by_id_options.tracestate
+
         # Construct URL
         url = self.get_by_id.metadata['url']
         path_format_arguments = {
@@ -149,6 +170,10 @@ class EventRoutesOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct and send request
         request = self._client.get(url, query_parameters, header_parameters)
@@ -170,21 +195,31 @@ class EventRoutesOperations(object):
     get_by_id.metadata = {'url': '/eventroutes/{id}'}
 
     def add(
-            self, id, endpoint_id, filter=None, custom_headers=None, raw=False, **operation_config):
+            self, id, endpoint_name, filter, event_routes_add_options=None, custom_headers=None, raw=False, **operation_config):
         """Adds or replaces an event route.
         Status codes:
-        200 (OK): Success.
-        400 (Bad Request): The request is invalid.
+        * 204 No Content
+        * 400 Bad Request
+        * EventRouteEndpointInvalid - The endpoint provided does not exist or
+        is not active.
+        * EventRouteFilterInvalid - The event route filter is invalid.
+        * EventRouteIdInvalid - The event route id is invalid.
+        * LimitExceeded - The maximum number of event routes allowed has been
+        reached.
 
         :param id: The id for an event route. The id is unique within event
          routes and case sensitive.
         :type id: str
-        :param endpoint_id: The id of the endpoint this event route is bound
-         to.
-        :type endpoint_id: str
+        :param endpoint_name: The name of the endpoint this event route is
+         bound to.
+        :type endpoint_name: str
         :param filter: An expression which describes the events which are
          routed to the endpoint.
         :type filter: str
+        :param event_routes_add_options: Additional parameters for the
+         operation
+        :type event_routes_add_options:
+         ~digitaltwins.models.EventRoutesAddOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -195,10 +230,15 @@ class EventRoutesOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if event_routes_add_options is not None:
+            traceparent = event_routes_add_options.traceparent
+        tracestate = None
+        if event_routes_add_options is not None:
+            tracestate = event_routes_add_options.tracestate
         event_route = None
-        if endpoint_id is not None or filter is not None:
-            # @digimaun - custom change related to endpointId -> endpointName
-            event_route = models.EventRoute(endpoint_name=endpoint_id, filter=filter)
+        if endpoint_name is not None or filter is not None:
+            event_route = models.EventRoute(endpoint_name=endpoint_name, filter=filter)
 
         # Construct URL
         url = self.add.metadata['url']
@@ -220,6 +260,10 @@ class EventRoutesOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct body
         if event_route is not None:
@@ -240,15 +284,20 @@ class EventRoutesOperations(object):
     add.metadata = {'url': '/eventroutes/{id}'}
 
     def delete(
-            self, id, custom_headers=None, raw=False, **operation_config):
+            self, id, event_routes_delete_options=None, custom_headers=None, raw=False, **operation_config):
         """Deletes an event route.
         Status codes:
-        200 (OK): Success.
-        404 (Not Found): There is no event route with the provided id.
+        * 204 No Content
+        * 404 Not Found
+        * EventRouteNotFound - The event route was not found.
 
         :param id: The id for an event route. The id is unique within event
          routes and case sensitive.
         :type id: str
+        :param event_routes_delete_options: Additional parameters for the
+         operation
+        :type event_routes_delete_options:
+         ~digitaltwins.models.EventRoutesDeleteOptions
         :param dict custom_headers: headers that will be added to the request
         :param bool raw: returns the direct response alongside the
          deserialized response
@@ -259,6 +308,13 @@ class EventRoutesOperations(object):
         :raises:
          :class:`ErrorResponseException<digitaltwins.models.ErrorResponseException>`
         """
+        traceparent = None
+        if event_routes_delete_options is not None:
+            traceparent = event_routes_delete_options.traceparent
+        tracestate = None
+        if event_routes_delete_options is not None:
+            tracestate = event_routes_delete_options.tracestate
+
         # Construct URL
         url = self.delete.metadata['url']
         path_format_arguments = {
@@ -278,6 +334,10 @@ class EventRoutesOperations(object):
             header_parameters.update(custom_headers)
         if self.config.accept_language is not None:
             header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
+        if traceparent is not None:
+            header_parameters['traceparent'] = self._serialize.header("traceparent", traceparent, 'str')
+        if tracestate is not None:
+            header_parameters['tracestate'] = self._serialize.header("tracestate", tracestate, 'str')
 
         # Construct and send request
         request = self._client.delete(url, query_parameters, header_parameters)

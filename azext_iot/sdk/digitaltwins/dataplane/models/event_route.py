@@ -24,18 +24,18 @@ class EventRoute(Model):
 
     :ivar id: The id of the event route.
     :vartype id: str
-    :param endpoint_id: Required. The id of the endpoint this event route is
-     bound to.
-    :type endpoint_id: str
-    :param filter: An expression which describes the events which are routed
-     to the endpoint.
+    :param endpoint_name: Required. The name of the endpoint this event route
+     is bound to.
+    :type endpoint_name: str
+    :param filter: Required. An expression which describes the events which
+     are routed to the endpoint.
     :type filter: str
     """
 
-    # @digimaun - endpointId/endpoint_id is now endpointName/endpoint_name
     _validation = {
         'id': {'readonly': True},
         'endpoint_name': {'required': True},
+        'filter': {'required': True},
     }
 
     _attribute_map = {

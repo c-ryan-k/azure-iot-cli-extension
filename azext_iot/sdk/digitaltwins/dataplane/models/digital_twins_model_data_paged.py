@@ -12,17 +12,16 @@
 from msrest.paging import Paged
 
 
-class ModelDataPaged(Paged):
+class DigitalTwinsModelDataPaged(Paged):
     """
-    A paging container for iterating over a list of :class:`ModelData <digitaltwins.models.ModelData>` object
+    A paging container for iterating over a list of :class:`DigitalTwinsModelData <digitaltwins.models.DigitalTwinsModelData>` object
     """
 
-    # @digimaun - [ModelData] -> [object]
     _attribute_map = {
         'next_link': {'key': 'nextLink', 'type': 'str'},
-        'current_page': {'key': 'value', 'type': '[object]'}
+        'current_page': {'key': 'value', 'type': '[DigitalTwinsModelData]'}
     }
 
     def __init__(self, *args, **kwargs):
 
-        super(ModelDataPaged, self).__init__(*args, **kwargs)
+        super(DigitalTwinsModelDataPaged, self).__init__(*args, **kwargs)

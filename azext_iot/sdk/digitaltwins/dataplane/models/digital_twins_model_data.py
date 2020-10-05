@@ -12,17 +12,17 @@
 from msrest.serialization import Model
 
 
-class ModelData(Model):
+class DigitalTwinsModelData(Model):
     """A model definition and metadata for that model.
 
     All required parameters must be populated in order to send to Azure.
 
     :param display_name: A language map that contains the localized display
      names as specified in the model definition.
-    :type display_name: object
+    :type display_name: dict[str, str]
     :param description: A language map that contains the localized
      descriptions as specified in the model definition.
-    :type description: object
+    :type description: dict[str, str]
     :param id: Required. The id of the model as specified in the model
      definition.
     :type id: str
@@ -41,8 +41,8 @@ class ModelData(Model):
     }
 
     _attribute_map = {
-        'display_name': {'key': 'displayName', 'type': 'object'},
-        'description': {'key': 'description', 'type': 'object'},
+        'display_name': {'key': 'displayName', 'type': '{str}'},
+        'description': {'key': 'description', 'type': '{str}'},
         'id': {'key': 'id', 'type': 'str'},
         'upload_time': {'key': 'uploadTime', 'type': 'iso-8601'},
         'decommissioned': {'key': 'decommissioned', 'type': 'bool'},
@@ -50,7 +50,7 @@ class ModelData(Model):
     }
 
     def __init__(self, **kwargs):
-        super(ModelData, self).__init__(**kwargs)
+        super(DigitalTwinsModelData, self).__init__(**kwargs)
         self.display_name = kwargs.get('display_name', None)
         self.description = kwargs.get('description', None)
         self.id = kwargs.get('id', None)

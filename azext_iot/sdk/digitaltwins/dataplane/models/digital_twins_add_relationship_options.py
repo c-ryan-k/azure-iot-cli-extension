@@ -12,8 +12,8 @@
 from msrest.serialization import Model
 
 
-class DigitalTwinModelsListOptions(Model):
-    """Additional parameters for list operation.
+class DigitalTwinsAddRelationshipOptions(Model):
+    """Additional parameters for add_relationship operation.
 
     :param traceparent: Identifies the request in a distributed tracing
      system.
@@ -21,19 +21,19 @@ class DigitalTwinModelsListOptions(Model):
     :param tracestate: Provides vendor-specific trace identification
      information and is a companion to traceparent.
     :type tracestate: str
-    :param max_items_per_page: The maximum number of items to retrieve per
-     request. The server may choose to return less than the requested number.
-    :type max_items_per_page: int
+    :param if_none_match: Only perform the operation if the entity does not
+     already exist. Possible values include: '*'
+    :type if_none_match: str or ~digitaltwins.models.enum
     """
 
     _attribute_map = {
         'traceparent': {'key': '', 'type': 'str'},
         'tracestate': {'key': '', 'type': 'str'},
-        'max_items_per_page': {'key': '', 'type': 'int'},
+        'if_none_match': {'key': '', 'type': 'str'},
     }
 
     def __init__(self, **kwargs):
-        super(DigitalTwinModelsListOptions, self).__init__(**kwargs)
+        super(DigitalTwinsAddRelationshipOptions, self).__init__(**kwargs)
         self.traceparent = kwargs.get('traceparent', None)
         self.tracestate = kwargs.get('tracestate', None)
-        self.max_items_per_page = kwargs.get('max_items_per_page', None)
+        self.if_none_match = kwargs.get('if_none_match', None)

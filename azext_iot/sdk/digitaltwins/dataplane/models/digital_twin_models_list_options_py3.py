@@ -15,16 +15,25 @@ from msrest.serialization import Model
 class DigitalTwinModelsListOptions(Model):
     """Additional parameters for list operation.
 
-    :param max_item_count: The maximum number of items to retrieve per
-     request. The server may choose to return less than the requested max.
-     Default value: -1 .
-    :type max_item_count: int
+    :param traceparent: Identifies the request in a distributed tracing
+     system.
+    :type traceparent: str
+    :param tracestate: Provides vendor-specific trace identification
+     information and is a companion to traceparent.
+    :type tracestate: str
+    :param max_items_per_page: The maximum number of items to retrieve per
+     request. The server may choose to return less than the requested number.
+    :type max_items_per_page: int
     """
 
     _attribute_map = {
-        'max_item_count': {'key': '', 'type': 'int'},
+        'traceparent': {'key': '', 'type': 'str'},
+        'tracestate': {'key': '', 'type': 'str'},
+        'max_items_per_page': {'key': '', 'type': 'int'},
     }
 
-    def __init__(self, *, max_item_count: int=-1, **kwargs) -> None:
+    def __init__(self, *, traceparent: str=None, tracestate: str=None, max_items_per_page: int=None, **kwargs) -> None:
         super(DigitalTwinModelsListOptions, self).__init__(**kwargs)
-        self.max_item_count = max_item_count
+        self.traceparent = traceparent
+        self.tracestate = tracestate
+        self.max_items_per_page = max_items_per_page

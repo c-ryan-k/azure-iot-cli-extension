@@ -12,8 +12,8 @@
 from msrest.serialization import Model
 
 
-class DigitalTwinModelsListOptions(Model):
-    """Additional parameters for list operation.
+class DigitalTwinsDeleteOptions(Model):
+    """Additional parameters for delete operation.
 
     :param traceparent: Identifies the request in a distributed tracing
      system.
@@ -21,19 +21,19 @@ class DigitalTwinModelsListOptions(Model):
     :param tracestate: Provides vendor-specific trace identification
      information and is a companion to traceparent.
     :type tracestate: str
-    :param max_items_per_page: The maximum number of items to retrieve per
-     request. The server may choose to return less than the requested number.
-    :type max_items_per_page: int
+    :param if_match: Only perform the operation if the entity's etag matches
+     one of the etags provided or * is provided.
+    :type if_match: str
     """
 
     _attribute_map = {
         'traceparent': {'key': '', 'type': 'str'},
         'tracestate': {'key': '', 'type': 'str'},
-        'max_items_per_page': {'key': '', 'type': 'int'},
+        'if_match': {'key': '', 'type': 'str'},
     }
 
-    def __init__(self, **kwargs):
-        super(DigitalTwinModelsListOptions, self).__init__(**kwargs)
-        self.traceparent = kwargs.get('traceparent', None)
-        self.tracestate = kwargs.get('tracestate', None)
-        self.max_items_per_page = kwargs.get('max_items_per_page', None)
+    def __init__(self, *, traceparent: str=None, tracestate: str=None, if_match: str=None, **kwargs) -> None:
+        super(DigitalTwinsDeleteOptions, self).__init__(**kwargs)
+        self.traceparent = traceparent
+        self.tracestate = tracestate
+        self.if_match = if_match
