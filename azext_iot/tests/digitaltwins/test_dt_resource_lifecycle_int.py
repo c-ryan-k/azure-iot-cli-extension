@@ -259,21 +259,18 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding eventgrid endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {} --tags {}".format(
+            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {}".format(
                 endpoints_instance_name,
                 self.dt_resource_group,
                 eventgrid_rg,
                 eventgrid_topic,
                 eventgrid_endpoint,
-                MOCK_ENDPOINT_TAGS,
             )
         ).get_output_in_json()
-
         assert_common_endpoint_attributes(
             add_ep_output,
             eventgrid_endpoint,
             ADTEndpointType.eventgridtopic,
-            MOCK_ENDPOINT_TAGS,
         )
 
         servicebus_rg = settings.env.azext_dt_ep_rg
@@ -284,14 +281,13 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding servicebus topic endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {} --tags {}".format(
+            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {}".format(
                 endpoints_instance_name,
                 servicebus_rg,
                 servicebus_namespace,
                 servicebus_policy,
                 servicebus_topic,
                 servicebus_endpoint,
-                MOCK_ENDPOINT_TAGS,
             )
         ).get_output_in_json()
 
@@ -299,7 +295,6 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
             add_ep_output,
             servicebus_endpoint,
             ADTEndpointType.servicebus,
-            MOCK_ENDPOINT_TAGS,
         )
 
         eventhub_rg = settings.env.azext_dt_ep_rg
@@ -322,7 +317,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
         ).get_output_in_json()
 
         assert_common_endpoint_attributes(
-            add_ep_output, eventhub_endpoint, ADTEndpointType.eventhub, None,
+            add_ep_output, eventhub_endpoint, ADTEndpointType.eventhub
         )
 
         show_ep_output = self.cmd(
@@ -332,7 +327,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
         ).get_output_in_json()
 
         assert_common_endpoint_attributes(
-            show_ep_output, eventhub_endpoint, ADTEndpointType.eventhub, None,
+            show_ep_output, eventhub_endpoint, ADTEndpointType.eventhub
         )
 
         show_ep_output = self.cmd(
@@ -345,7 +340,6 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
             show_ep_output,
             servicebus_endpoint,
             ADTEndpointType.servicebus,
-            MOCK_ENDPOINT_TAGS,
         )
 
         list_ep_output = self.cmd(
@@ -432,7 +426,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
                     "-g {}".format(self.dt_resource_group) if is_last else "",
                 )
             ).get_output_in_json()
-            assert delete_ep_output["provisioningState"] == "Deleting"
+            assert delete_ep_output["properties"]["provisioningState"] == "Deleting"
             assert delete_ep_output["id"].endswith("/{}".format(endpoint_name))
             sleep(15)  # Wait for service to catch-up. Service will fix at some point.
 
@@ -467,7 +461,7 @@ def assert_common_route_attributes(
 
 
 def assert_common_endpoint_attributes(
-    endpoint_output, endpoint_name, endpoint_type, tags
+    endpoint_output, endpoint_name, endpoint_type
 ):
     assert endpoint_output["id"].endswith("/{}".format(endpoint_name))
     assert (
@@ -476,14 +470,11 @@ def assert_common_endpoint_attributes(
     )
     assert endpoint_output["resourceGroup"]
 
-    if tags:
-        assert endpoint_output["properties"]["tags"] == validate_key_value_pairs(tags)
-
     assert endpoint_output["properties"]["provisioningState"]
     assert endpoint_output["properties"]["createdTime"]
 
     if endpoint_type == ADTEndpointType.eventgridtopic:
-        assert endpoint_output["properties"]["TopicEndpoint"]
+        assert endpoint_output["properties"]["topicEndpoint"]
         assert endpoint_output["properties"]["accessKey1"]
         assert endpoint_output["properties"]["accessKey2"]
         assert endpoint_output["properties"]["endpointType"] == "EventGrid"
@@ -494,8 +485,8 @@ def assert_common_endpoint_attributes(
         assert endpoint_output["properties"]["endpointType"] == "ServiceBus"
         return
     if endpoint_type == ADTEndpointType.eventhub:
-        assert endpoint_output["properties"]["connectionString-PrimaryKey"]
-        assert endpoint_output["properties"]["connectionString-SecondaryKey"]
+        assert endpoint_output["properties"]["connectionStringPrimaryKey"]
+        assert endpoint_output["properties"]["connectionStringSecondaryKey"]
         assert endpoint_output["properties"]["endpointType"] == "EventHub"
         return
 

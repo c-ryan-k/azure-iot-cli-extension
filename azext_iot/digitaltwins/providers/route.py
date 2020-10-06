@@ -40,7 +40,7 @@ class RouteProvider(DigitalTwinsProvider):
 
         # TODO: Adding routes does not return an object
         try:
-            self.sdk.add(id=route_name, endpoint_id=endpoint_name, filter=filter)
+            self.sdk.add(id=route_name, endpoint_name=endpoint_name, filter=filter)
         except ErrorResponseException as e:
             raise CLIError(unpack_msrest_error(e))
 
