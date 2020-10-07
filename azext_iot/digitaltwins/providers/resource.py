@@ -233,6 +233,7 @@ class ResourceProvider(DigitalTwinsResourceManager):
         endpoint_resource_policy=None,
         endpoint_resource_namespace=None,
         endpoint_subscription=None,
+        dead_letter_endpoint=None,
         tags=None,
         resource_group_name=None,
         timeout=20,
@@ -291,7 +292,7 @@ class ResourceProvider(DigitalTwinsResourceManager):
             properties = EventGridEndpointProperties(
                 access_key1=eg_topic_keys["key1"],
                 access_key2=eg_topic_keys["key2"],
-                dead_letter_secret=None,
+                dead_letter_secret=dead_letter_endpoint,
                 topic_endpoint=eg_topic_endpoint["endpoint"],
             )
 
@@ -313,7 +314,7 @@ class ResourceProvider(DigitalTwinsResourceManager):
             properties = ServiceBusEndpointProperties(
                 primary_connection_string=sb_topic_keys["primaryConnectionString"],
                 secondary_connection_string=sb_topic_keys["secondaryConnectionString"],
-                dead_letter_secret=None,
+                dead_letter_secret=dead_letter_endpoint,
             )
 
         elif endpoint_resource_type == ADTEndpointType.eventhub:
@@ -338,7 +339,7 @@ class ResourceProvider(DigitalTwinsResourceManager):
                 connection_string_secondary_key=eventhub_topic_keys[
                     "secondaryConnectionString"
                 ],
-                dead_letter_secret=None,
+                dead_letter_secret=dead_letter_endpoint,
             )
 
         try:

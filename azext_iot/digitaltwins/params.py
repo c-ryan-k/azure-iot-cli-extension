@@ -102,9 +102,9 @@ def load_digitaltwins_arguments(self, _):
 
     with self.argument_context("dt endpoint create") as context:
         context.argument(
-            "tags",
-            options_list=["--tags"],
-            help="Digital Twins endpoint tags. Property bag in key-value pairs with the following format: a=b;c=d.",
+            "dead_letter_endpoint",
+            options_list=["--dead-letter-endpoint", "--dle"],
+            help="Dead letter storage container URL with SAS token"
         )
 
     with self.argument_context("dt endpoint create eventgrid") as context:

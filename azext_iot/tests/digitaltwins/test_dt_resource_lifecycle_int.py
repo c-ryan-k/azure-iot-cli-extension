@@ -14,6 +14,7 @@ from . import DTLiveScenarioTest
 from . import (
     MOCK_RESOURCE_TAGS,
     MOCK_ENDPOINT_TAGS,
+    MOCK_DEAD_LETTER_SECRET,
     generate_resource_id,
 )
 
@@ -259,12 +260,13 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding eventgrid endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {}".format(
+            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {} --dle {}".format(
                 endpoints_instance_name,
                 self.dt_resource_group,
                 eventgrid_rg,
                 eventgrid_topic,
                 eventgrid_endpoint,
+                MOCK_DEAD_LETTER_SECRET
             )
         ).get_output_in_json()
         assert_common_endpoint_attributes(
@@ -281,13 +283,14 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding servicebus topic endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {}".format(
+            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {} --dle {}".format(
                 endpoints_instance_name,
                 servicebus_rg,
                 servicebus_namespace,
                 servicebus_policy,
                 servicebus_topic,
                 servicebus_endpoint,
+                MOCK_DEAD_LETTER_SECRET
             )
         ).get_output_in_json()
 
@@ -305,7 +308,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding eventhub endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create eventhub -n {} --ehg {} --ehn {} --ehp {} --eh {} --ehs {} --en {}".format(
+            "dt endpoint create eventhub -n {} --ehg {} --ehn {} --ehp {} --eh {} --ehs {} --en {} --dle {}".format(
                 endpoints_instance_name,
                 eventhub_rg,
                 eventhub_namespace,
@@ -313,6 +316,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
                 eventhub_topic,
                 self.current_subscription,
                 eventhub_endpoint,
+                MOCK_DEAD_LETTER_SECRET
             )
         ).get_output_in_json()
 
@@ -461,7 +465,7 @@ def assert_common_route_attributes(
 
 
 def assert_common_endpoint_attributes(
-    endpoint_output, endpoint_name, endpoint_type
+    endpoint_output, endpoint_name, endpoint_type, dead_letter_secret=None
 ):
     assert endpoint_output["id"].endswith("/{}".format(endpoint_name))
     assert (
@@ -472,6 +476,9 @@ def assert_common_endpoint_attributes(
 
     assert endpoint_output["properties"]["provisioningState"]
     assert endpoint_output["properties"]["createdTime"]
+    if dead_letter_secret:
+        import pdb; pdb.set_trace()
+        assert endpoint_output["properties"]["deadLetterSecret"]
 
     if endpoint_type == ADTEndpointType.eventgridtopic:
         assert endpoint_output["properties"]["topicEndpoint"]
