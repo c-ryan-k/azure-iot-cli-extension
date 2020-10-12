@@ -31,7 +31,7 @@ class TwinProvider(DigitalTwinsProvider):
 
         accumulated_result, cost = accumulate_result(
             self.query_sdk.query_twins,
-            values_name="items",
+            values_name="value",
             token_name="continuationToken",
             token_arg_name="continuation_token",
             query=query,
