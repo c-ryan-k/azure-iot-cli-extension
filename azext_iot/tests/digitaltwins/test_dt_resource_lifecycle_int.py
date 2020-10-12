@@ -260,7 +260,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding eventgrid endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {} --dle {}".format(
+            "dt endpoint create eventgrid -n {} -g {} --egg {} --egt {} --en {} --dsu {}".format(
                 endpoints_instance_name,
                 self.dt_resource_group,
                 eventgrid_rg,
@@ -283,7 +283,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding servicebus topic endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {} --dle {}".format(
+            "dt endpoint create servicebus -n {} --sbg {} --sbn {} --sbp {} --sbt {} --en {} --dsu {}".format(
                 endpoints_instance_name,
                 servicebus_rg,
                 servicebus_namespace,
@@ -308,7 +308,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
 
         logger.debug("Adding eventhub endpoint...")
         add_ep_output = self.cmd(
-            "dt endpoint create eventhub -n {} --ehg {} --ehn {} --ehp {} --eh {} --ehs {} --en {} --dle {}".format(
+            "dt endpoint create eventhub -n {} --ehg {} --ehn {} --ehp {} --eh {} --ehs {} --en {} --dsu {}".format(
                 endpoints_instance_name,
                 eventhub_rg,
                 eventhub_namespace,

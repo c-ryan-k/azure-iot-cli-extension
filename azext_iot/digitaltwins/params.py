@@ -103,8 +103,9 @@ def load_digitaltwins_arguments(self, _):
     with self.argument_context("dt endpoint create") as context:
         context.argument(
             "dead_letter_endpoint",
-            options_list=["--dead-letter-endpoint", "--dle"],
-            help="Dead letter storage container URL with SAS token"
+            options_list=["--deadletter-sas-uri", "--dsu"],
+            help="Dead-letter storage container URL with SAS token",
+            arg_group="Dead-letter Endpoint"
         )
 
     with self.argument_context("dt endpoint create eventgrid") as context:
