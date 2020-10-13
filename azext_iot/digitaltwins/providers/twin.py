@@ -237,7 +237,7 @@ class TwinProvider(DigitalTwinsProvider):
         if component_path:
             self.twins_sdk.send_component_telemetry(
                 id=twin_id,
-                dt_id=dt_id,
+                message_id=dt_id,
                 dt_timestamp=dt_timestamp,
                 component_path=component_path,
                 telemetry=telemetry_request,
@@ -245,7 +245,7 @@ class TwinProvider(DigitalTwinsProvider):
 
         self.twins_sdk.send_telemetry(
             id=twin_id,
-            dt_id=dt_id,
+            message_id=dt_id,
             dt_timestamp=dt_timestamp,
             telemetry=telemetry_request,
         )

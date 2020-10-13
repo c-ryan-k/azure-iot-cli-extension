@@ -5,7 +5,7 @@
   "displayName": "Floor",
   "contents": [{
     "@type": "Relationship",
-    "@id": "dtmi:contosocom:DigitalTwins:contains;1",
+    "target": "dtmi:example:Room;1",
     "name": "contains",
     "properties": [{
         "@type": "Property",

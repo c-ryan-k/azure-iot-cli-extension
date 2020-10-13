@@ -247,7 +247,7 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
             )
         )
 
-        sleep(4)  # Wait for service to catch-up
+        sleep(10)  # Wait for service to catch-up
 
         list_ep_output = self.cmd(
             "dt endpoint list -n {}".format(endpoints_instance_name)

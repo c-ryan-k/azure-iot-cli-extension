@@ -25,7 +25,7 @@ class ResourceProvider(DigitalTwinsResourceManager):
         self.mgmt_sdk = self.get_mgmt_sdk()
         self.rbac = RbacProvider()
 
-    def create(self, name, resource_group_name, location=None, tags=None, timeout=20):
+    def create(self, name, resource_group_name, location=None, tags=None, timeout=30):
         if tags:
             tags = validate_key_value_pairs(tags)
 
