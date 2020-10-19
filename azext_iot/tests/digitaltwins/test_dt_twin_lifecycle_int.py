@@ -24,9 +24,9 @@ class TestDTTwinLifecycle(DTLiveScenarioTest):
     def test_dt_twin(self):
         instance_name = generate_resource_id()
         models_directory = "./models"
-        floor_dtmi = "dtmi:example:Floor;1"
+        floor_dtmi = "dtmi:com:example:Floor;1"
         floor_twin_id = "myfloor"
-        room_dtmi = "dtmi:example:Room;1"
+        room_dtmi = "dtmi:com:example:Room;1"
         room_twin_id = "myroom"
         thermostat_component_id = "Thermostat"
 

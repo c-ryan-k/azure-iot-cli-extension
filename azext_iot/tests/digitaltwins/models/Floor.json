@@ -5,7 +5,7 @@
   "displayName": "Floor",
   "contents": [{
     "@type": "Relationship",
-    "target": "dtmi:example:Room;1",
+    "target": "dtmi:com:example:Room;1",
     "name": "contains",
     "properties": [{
         "@type": "Property",

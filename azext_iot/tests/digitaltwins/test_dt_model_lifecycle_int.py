@@ -30,7 +30,7 @@ class TestDTModelLifecycle(DTLiveScenarioTest):
         models_directory = "./models"
         inline_model = "./models/Floor.json"
         component_dtmi = "dtmi:com:example:Thermostat;1"
-        room_dtmi = "dtmi:example:Room;1"
+        room_dtmi = "dtmi:com:example:Room;1"
 
         self.cmd(
             "dt create -n {} -g {} -l {}".format(
