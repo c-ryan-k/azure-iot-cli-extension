@@ -48,7 +48,7 @@ class TwinProvider(DigitalTwinsProvider):
         target_model = self.model_provider.get(id=model_id)
         twin_request = {
             "$dtId": twin_id,
-            "$metadata": {"$model": target_model["id"], "$kind": "DigitalTwin"},
+            "$metadata": {"$model": target_model["id"]},
         }
 
         if properties:
