@@ -423,17 +423,25 @@ class TestDTResourceLifecycle(DTLiveScenarioTest):
         for endpoint_name in endpoint_names:
             logger.debug("Cleaning up {} endpoint...".format(endpoint_name))
             is_last = endpoint_name == endpoint_names[-1]
-            delete_ep_output = self.cmd(
+            self.cmd(
                 "dt endpoint delete -n {} --en {} {}".format(
                     endpoints_instance_name,
                     endpoint_name,
                     "-g {}".format(self.dt_resource_group) if is_last else "",
                 )
-            ).get_output_in_json()
-            assert delete_ep_output["properties"]["provisioningState"] == "Deleting"
-            assert delete_ep_output["id"].endswith("/{}".format(endpoint_name))
-            sleep(15)  # Wait for service to catch-up. Service will fix at some point.
+            )
+            # DT endpoint delete does not currently return data
+            # ).get_output_in_json()
+            # assert delete_ep_output["properties"]["provisioningState"] == "Deleting"
+            # assert delete_ep_output["id"].endswith("/{}".format(endpoint_name))
+            sleep(10)  # Wait for service to catch-up. Service will fix at some point.
 
+        list_endpoint_output = self.cmd(
+            "dt endpoint list -n {} -g {}".format(
+                endpoints_instance_name, self.dt_resource_group
+            )
+        ).get_output_in_json()
+        assert len(list_endpoint_output) == 0
         self.cmd(
             "dt delete -n {} -g {}".format(
                 endpoints_instance_name, self.dt_resource_group
