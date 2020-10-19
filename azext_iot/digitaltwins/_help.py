@@ -285,7 +285,9 @@ def load_digitaltwins_help():
     helps["dt twin create"] = """
         type: command
         short-summary: Create a digital twin on an instance.
-        long-summary: --properties can be inline JSON or file path.
+        long-summary: |
+                      --properties can be inline JSON or file path.
+                      Note: --properties are required for twins that contain components.
 
         examples:
         - name: Create a digital twin from an existing (prior-created) model.
