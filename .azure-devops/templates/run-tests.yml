@@ -2,6 +2,7 @@ parameters:
   pythonVersion: ''
   runUnitTestsOnly: 'true'
   runWithAzureCliReleased: 'false'
+  testPath: 'azext_iot/tests'
 
 steps:
   - task: UsePythonVersion@0
@@ -33,11 +34,11 @@ steps:
         azureSubscription: AzIoTCLIService
         scriptType: bash
         scriptLocation: inlineScript
-        inlineScript: pytest -vv -r azext_iot/tests/ --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-full-results.xml --cov-report=xml
+        inlineScript: pytest -vv -r ${{ parameters.testPath }} --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-full-results.xml --cov-report=xml
 
   - ${{ if eq(parameters.runUnitTestsOnly, 'true') }}:
 
-    - script: pytest -vv -r azext_iot/tests/ -k "_unit" --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-unit-results.xml --cov-report=xml
+    - script: pytest -vv -r ${{ parameters.testPath }} -k "_unit" --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-unit-results.xml --cov-report=xml
       displayName: 'Execute IoT extension unit tests'
 
   - task: PublishCodeCoverageResults@1
