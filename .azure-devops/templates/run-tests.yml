@@ -1,6 +1,6 @@
 parameters:
   pythonVersion: ''
-  runUnitTestsOnly: 'true'
+  runUnitTestsOnly: 'false'
   runWithAzureCliReleased: 'false'
   path: ''
 
