@@ -2,7 +2,7 @@ parameters:
   pythonVersion: ''
   runUnitTestsOnly: 'true'
   runWithAzureCliReleased: 'false'
-  testPath: 'azext_iot/tests'
+  path: ''
 
 steps:
   - task: UsePythonVersion@0
@@ -27,32 +27,14 @@ steps:
   - template: set-testenv-sentinel.yml
 
   - ${{ if eq(parameters.runUnitTestsOnly, 'false') }}:
-
     - task: AzureCLI@2
-      displayName: 'Execute full IoT extension test run'
+      displayName: 'Test: ${{ parameters.path }}'
       inputs:
         azureSubscription: AzIoTCLIService
         scriptType: bash
         scriptLocation: inlineScript
-        inlineScript: pytest -vv -r ${{ parameters.testPath }} --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-full-results.xml --cov-report=xml
+        inlineScript: pytest -vv -r azext_iot/tests/${{ parameters.path }} --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-${{ parameters.path }}.xml --cov-report=xml
 
   - ${{ if eq(parameters.runUnitTestsOnly, 'true') }}:
-
-    - script: pytest -vv -r ${{ parameters.testPath }} -k "_unit" --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-unit-results.xml --cov-report=xml
-      displayName: 'Execute IoT extension unit tests'
-
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: 'cobertura'
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
-      additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
-
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    displayName: 'Publish Test Results'
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/test-*.xml'
-      testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
-      searchFolder: '$(System.DefaultWorkingDirectory)'
+    - script: pytest -vv -r azext_iot/tests/${{ parameters.path }} -k "_unit" --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-unit-${{ parameters.path }}.xml --cov-report=xml
+      displayName: 'Unit Test: ${{ parameters.path }}'
