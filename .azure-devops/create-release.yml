@@ -3,10 +3,11 @@ pr: none
 trigger: none
 
 parameters:
-  testPaths: [
-    'azext_iot/central'
-    'azext_iot/digitaltwins'
-  ]
+  - name: testPaths
+    type: object
+    default:
+      - 'central'
+      - 'digitaltwins'
 
 stages:
   - stage: 'build'
@@ -44,7 +45,7 @@ stages:
   - ${{ each path in parameters.testPaths }}:
     - stage: 'test ${{ path }}'
       displayName: 'Test: ${{ path }}'
-      dependsOn: 'build'
+      dependsOn: build
       jobs:
       - job: 'Run_Tests'
         pool:
