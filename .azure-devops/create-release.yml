@@ -73,25 +73,25 @@ stages:
                 print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
                 print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
 
-  - stage: 'codecov'
-    jobs:
-    - job: "Publish_results"
-      steps:
-      - task: PublishCodeCoverageResults@1
-        inputs:
-          codeCoverageTool: 'cobertura'
-          summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
-          reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
-          additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
+  # - stage: 'codecov'
+  #   jobs:
+  #   - job: "Publish_results"
+  #     steps:
+  #     - task: PublishCodeCoverageResults@1
+  #       inputs:
+  #         codeCoverageTool: 'cobertura'
+  #         summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+  #         reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
+  #         additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
 
-      - task: PublishTestResults@2
-        condition: succeededOrFailed()
-        displayName: 'Publish Test Results'
-        inputs:
-          testResultsFormat: 'JUnit'
-          testResultsFiles: '**/test-*.xml'
-          testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
+  #     - task: PublishTestResults@2
+  #       condition: succeededOrFailed()
+  #       displayName: 'Publish Test Results'
+  #       inputs:
+  #         testResultsFormat: 'JUnit'
+  #         testResultsFiles: '**/test-*.xml'
+  #         testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
+  #         searchFolder: '$(System.DefaultWorkingDirectory)'
 
 
   # - stage: 'release'
