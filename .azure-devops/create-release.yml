@@ -43,7 +43,7 @@ stages:
       - template: templates/build-publish-azure-cli-test-sdk.yml
 
   - ${{ each path in parameters.testPaths }}:
-    - stage: 'test ${{ path }}'
+    - stage: 'test_${{ path }}'
       displayName: 'Test: ${{ path }}'
       dependsOn: build
       jobs:
