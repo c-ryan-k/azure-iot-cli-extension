@@ -30,7 +30,7 @@ steps:
     - task: AzureCLI@2
       displayName: 'Test: ${{ parameters.path }}'
       inputs:
-        azureSubscription: AzIoTCLIService
+        azureSubscription: cli-test-service-connection
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: pytest -vv -r azext_iot/tests/${{ parameters.path }} --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-${{ parameters.path }}.xml --cov-report=xml
