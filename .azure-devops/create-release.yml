@@ -2,31 +2,6 @@ pr: none
 
 trigger: none
 
-parameters:
-  - name: testPaths
-    type: object
-    default:
-        central:
-          name: 'IoT Central'
-          path: 'azext_iot/tests/central'
-          stageName: 'test_central'
-        digitaltwins:
-          name: 'Azure DigitalTwins'
-          path: 'azext_iot/tests/digitaltwins'
-          stageName: 'test_adt'
-        dps:
-          name: 'Device Provisioning Service'
-          path: 'azext_iot/tests/dps'
-          stageName: 'test_dps'
-        iothub:
-          name: 'IoT Hub'
-          path: 'azext_iot/tests/iothub'
-          stageName: 'test_hub'
-        utility:
-          name: 'Utility'
-          path: 'azext_iot/tests/utility'
-          stageName: 'test_utilities'
-
 stages:
   - stage: 'build'
     displayName: 'Build and Publish Artifacts'
@@ -60,37 +35,72 @@ stages:
 
       - template: templates/build-publish-azure-cli-test-sdk.yml
 
-  - ${{ each path in parameters.testPaths }}:
-  - stage: '${{ path.stageName }}'
-    displayName: 'Test ${{ path.name }}'
+  - stage: 'test'
+    displayName: 'Run tests'
+    pool:
+      vmImage: 'Ubuntu-16.04'
     dependsOn: build
     jobs:
-    - job: 'Run_Tests'
-      pool:
-        vmImage: 'Ubuntu-16.04'
-
+    - job: 'testCentral'
+      displayName: 'Test IoT Central'
       steps:
-        - template: templates/run-tests.yml
-          parameters:
-            pythonVersion: '3.6.x'
-            runUnitTestsOnly: 'false'
-            path: ${{ path.path }}
-            name: ${{ path.name }}
+      - template: templates/run-tests.yml
+        parameters:
+          pythonVersion: '3.6.x'
+          runUnitTestsOnly: 'false'
+          path: 'azext_iot/tests/central'
+          name: 'IoT-Central'
+    - job: 'testADT'
+      displayName: 'Test Azure DigitalTwins'
+      steps:
+      - template: templates/run-tests.yml
+        parameters:
+          pythonVersion: '3.6.x'
+          runUnitTestsOnly: 'false'
+          path: 'azext_iot/tests/digitaltwins'
+          name: 'Azure-DigitalTwins'
+    - job: 'testDPS'
+      displayName: 'Test DPS'
+      steps:
+      - template: templates/run-tests.yml
+        parameters:
+          pythonVersion: '3.6.x'
+          runUnitTestsOnly: 'false'
+          path: 'azext_iot/tests/dps'
+          name: 'Device-Provisioning-Service'
+    - job: 'testHub'
+      displayName: 'Test IoT Hub'
+      steps:
+      - template: templates/run-tests.yml
+        parameters:
+          pythonVersion: '3.6.x'
+          runUnitTestsOnly: 'false'
+          path: 'azext_iot/tests/iothub'
+          name: 'IoT-Hub'
+    - job: 'testUtility'
+      displayName: 'Test IoT Utilities'
+      steps:
+      - template: templates/run-tests.yml
+        parameters:
+          pythonVersion: '3.6.x'
+          runUnitTestsOnly: 'false'
+          path: 'azext_iot/tests/utility'
+          name: 'Utilities'
 
-        - script: 'pip install .'
-          displayName: 'Install the whl locally'
-          workingDirectory: '.'
+        # - script: 'pip install .'
+        #   displayName: 'Install the whl locally'
+        #   workingDirectory: '.'
 
-        - task: PythonScript@0
-          displayName : 'setupVersion'
-          name: 'setupVersion'
-          inputs:
-            scriptSource: 'inline'
-            script: |
-              from azext_iot.constants import VERSION
-              print("Version is " + VERSION)
-              print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
-              print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
+        # - task: PythonScript@0
+        #   displayName : 'setupVersion'
+        #   name: 'setupVersion'
+        #   inputs:
+        #     scriptSource: 'inline'
+        #     script: |
+        #       from azext_iot.constants import VERSION
+        #       print("Version is " + VERSION)
+        #       print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
+        #       print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
 
 
   # - stage: 'release'
