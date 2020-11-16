@@ -6,9 +6,26 @@ parameters:
   - name: testPaths
     type: object
     default:
-      - 'central'
-      - 'digitaltwins'
-      - 'iothub'
+        central:
+          name: 'IoT Central'
+          path: 'azext_iot/tests/central'
+          stageName: 'test_central'
+        digitaltwins:
+          name: 'Azure DigitalTwins'
+          path: 'azext_iot/tests/digitaltwins'
+          stageName: 'test_adt'
+        dps:
+          name: 'Device Provisioning Service'
+          path: 'azext_iot/tests/dps'
+          stageName: 'test_dps'
+        iothub:
+          name: 'IoT Hub'
+          path: 'azext_iot/tests/iothub'
+          stageName: 'test_hub'
+        utility:
+          name: 'Utility'
+          path: 'azext_iot/tests/utility'
+          stageName: 'test_utilities'
 
 stages:
   - stage: 'build'
@@ -44,55 +61,36 @@ stages:
       - template: templates/build-publish-azure-cli-test-sdk.yml
 
   - ${{ each path in parameters.testPaths }}:
-    - stage: 'test_${{ path }}'
-      displayName: 'Test: ${{ path }}'
-      dependsOn: build
-      jobs:
-      - job: 'Run_Tests'
-        pool:
-          vmImage: 'Ubuntu-16.04'
+  - stage: '${{ path.stageName }}'
+    displayName: 'Test ${{ path.name }}'
+    dependsOn: build
+    jobs:
+    - job: 'Run_Tests'
+      pool:
+        vmImage: 'Ubuntu-16.04'
 
-        steps:
-          - template: templates/run-tests.yml
-            parameters:
-              pythonVersion: '3.6.x'
-              runUnitTestsOnly: 'false'
-              path: ${{ path }}
+      steps:
+        - template: templates/run-tests.yml
+          parameters:
+            pythonVersion: '3.6.x'
+            runUnitTestsOnly: 'false'
+            path: ${{ path.path }}
+            name: ${{ path.name }}
 
-          - script: 'pip install .'
-            displayName: 'Install the whl locally'
-            workingDirectory: '.'
+        - script: 'pip install .'
+          displayName: 'Install the whl locally'
+          workingDirectory: '.'
 
-          - task: PythonScript@0
-            displayName : 'setupVersion'
-            name: 'setupVersion'
-            inputs:
-              scriptSource: 'inline'
-              script: |
-                from azext_iot.constants import VERSION
-                print("Version is " + VERSION)
-                print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
-                print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
-
-  # - stage: 'codecov'
-  #   jobs:
-  #   - job: "Publish_results"
-  #     steps:
-  #     - task: PublishCodeCoverageResults@1
-  #       inputs:
-  #         codeCoverageTool: 'cobertura'
-  #         summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
-  #         reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
-  #         additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
-
-  #     - task: PublishTestResults@2
-  #       condition: succeededOrFailed()
-  #       displayName: 'Publish Test Results'
-  #       inputs:
-  #         testResultsFormat: 'JUnit'
-  #         testResultsFiles: '**/test-*.xml'
-  #         testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
-  #         searchFolder: '$(System.DefaultWorkingDirectory)'
+        - task: PythonScript@0
+          displayName : 'setupVersion'
+          name: 'setupVersion'
+          inputs:
+            scriptSource: 'inline'
+            script: |
+              from azext_iot.constants import VERSION
+              print("Version is " + VERSION)
+              print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
+              print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
 
 
   # - stage: 'release'
