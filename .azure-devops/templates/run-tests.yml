@@ -1,6 +1,7 @@
 parameters:
   pythonVersion: ''
-  runUnitTestsOnly: 'false'
+  runUnitTests: 'false'
+  runIntTests: 'true'
   runWithAzureCliReleased: 'false'
   path: 'azext_iot/tests'
   name: 'All'
@@ -27,26 +28,25 @@ steps:
 
   - template: set-testenv-sentinel.yml
 
-  - ${{ if eq(parameters.runUnitTestsOnly, 'false') }}:
+  - ${{ if eq(parameters.runIntTests, 'true') }}:
     - task: AzureCLI@2
-      displayName: '${{ parameters.name }} tests'
+      displayName: '${{ parameters.name }} integration tests'
       inputs:
         azureSubscription: AzIoTCLIService
         scriptType: bash
         scriptLocation: inlineScript
-        inlineScript: pytest -vv ${{ parameters.path }} --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-${{ parameters.name }}.xml --cov-report=xml
+        inlineScript: pytest -vv ${{ parameters.path }} -k "_int"  --junitxml=junit/test-iotext-int-${{ parameters.name }}.xml
 
-  - ${{ if eq(parameters.runUnitTestsOnly, 'true') }}:
+  - ${{ if eq(parameters.runUnitTests, 'true') }}:
     - script: pytest -vv ${{ parameters.path }} -k "_unit" --cov=azext_iot --cov-config .coveragerc --junitxml=junit/test-iotext-unit-${{ parameters.name }}.xml --cov-report=xml
       displayName: '${{ parameters.name }} unit tests'
-
   
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: 'cobertura'
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
-      additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'cobertura'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+        reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov'
+        additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/htmlcov/**/*.*'
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
@@ -56,3 +56,18 @@ steps:
       testResultsFiles: '**/test-*.xml'
       testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
       searchFolder: '$(System.DefaultWorkingDirectory)'
+
+  - script: 'pip install .'
+    displayName: 'Install the whl locally'
+    workingDirectory: '.'
+
+  - task: PythonScript@0
+    displayName : 'setupVersion'
+    name: 'setupVersion'
+    inputs:
+      scriptSource: 'inline'
+      script: |
+        from azext_iot.constants import VERSION
+        print("Version is " + VERSION)
+        print("##vso[task.setvariable variable=CLIVersion;isOutput=true]"+VERSION)
+        print("##vso[task.setvariable variable=ReleaseTitle;isOutput=true]"+"azure-iot "+VERSION)
