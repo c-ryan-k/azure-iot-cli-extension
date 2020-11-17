@@ -54,7 +54,7 @@ steps:
     inputs:
       testResultsFormat: 'JUnit'
       testResultsFiles: '**/test-*.xml'
-      testRunTitle: 'Publish test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
+      testRunTitle: 'Publish ${{ @parameters.name }} test results for Python ${{ parameters.pythonVersion }} on OS $(Agent.OS)'
       searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - script: 'pip install .'
