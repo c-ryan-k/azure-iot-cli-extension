@@ -99,9 +99,9 @@ stages:
     displayName: 'Stage GitHub release'
     dependsOn: [build, test]
     jobs:
-    - deployment: 'StageGitHub'
-      displayName: 'Stage CLI extension on GitHub'
-      environment: 'production'
+    # - deployment: 'StageGitHub'
+    #   displayName: 'Stage CLI extension on GitHub'
+    #   environment: 'production'
 
     - job: 'Calculate_Sha_And_Create_Release'
       pool:
@@ -135,7 +135,7 @@ stages:
 
       - task: GitHubRelease@0
         inputs:
-          gitHubConnection: AzIoTCLIGitHub
+          gitHubConnection: github.com_c-ryan-k
           repositoryName: $(Build.Repository.Name)
           action: 'create'
           target: '$(Build.SourceVersion)'
