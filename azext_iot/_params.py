@@ -439,6 +439,14 @@ def load_arguments(self, _):
             arg_type=get_enum_type(AuthenticationType),
             help="Authentication type for communicating with the storage container.",
         )
+        context.argument(
+            "identity",
+            options_list=["--identity"],
+            help="Managed identity type to determine if system assigned managed identity or "
+            "user assigned managed identity is used. For system assigned managed identity, use "
+            "[system]. For user assigned managed identity, provide the user assigned managed "
+            "identity string.",
+        )
 
     with self.argument_context("iot hub device-identity import") as context:
         context.argument(
@@ -464,6 +472,14 @@ def load_arguments(self, _):
             options_list=["--auth-type", "--storage-authentication-type"],
             arg_type=get_enum_type(AuthenticationType),
             help="Authentication type for communicating with the storage container.",
+        )
+        context.argument(
+            "identity",
+            options_list=["--identity"],
+            help="Managed identity type to determine if system assigned managed identity or "
+            "user assigned managed identity is used. For system assigned managed identity, use "
+            "[system]. For user assigned managed identity, provide the user assigned managed "
+            "identity string.",
         )
 
     with self.argument_context("iot hub device-identity get-parent") as context:
