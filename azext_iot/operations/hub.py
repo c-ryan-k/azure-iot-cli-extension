@@ -2285,21 +2285,15 @@ def iot_device_export(
     blob_container_uri,
     include_keys=False,
     storage_authentication_type=None,
-    resource_group_name=None,
     identity=None,
+    resource_group_name=None,
 ):
     from azext_iot._factory import iot_hub_service_factory
-
     client = iot_hub_service_factory(cmd.cli_ctx)
     discovery = IotHubDiscovery(cmd)
     target = discovery.get_target(
         hub_name=hub_name, resource_group_name=resource_group_name
     )
-    print("line 2302 - [system] identity True")
-    # debug
-    identity = '[system]'
-    storage_authentication_type = 'identity'
-    include_keys = True
 
     if exists(blob_container_uri):
         blob_container_uri = read_file_content(blob_container_uri)
@@ -2314,16 +2308,12 @@ def iot_device_export(
             else None
         )
 
-        if identity == "[system]":
-            identity = None
-        elif identity is not None:
-            if storage_authentication_type != AuthenticationType.identityBased:
-                raise CLIError(
-                    "Authentication Type must be IdentityBased to use identity"
-                )
-            # maybe check the managed identity string?
-            # identity should be an object that has a string property
-            identity = ManagedIdentity(identity)
+        identity = (
+            ManagedIdentity(user_assigned_identity=identity)
+            if (identity not in [None, '[system]'] and
+                storage_authentication_type == AuthenticationType.identityBased.name)
+            else None
+        )
 
         export_request = ExportDevicesRequest(
             export_blob_container_uri=blob_container_uri,
@@ -2331,7 +2321,7 @@ def iot_device_export(
             authentication_type=storage_authentication_type,
             identity=identity,
         )
-        print(export_request.__dict__)
+
         return client.export_devices(
             target["resourcegroup"], hub_name, export_devices_parameters=export_request,
         )
@@ -2379,12 +2369,21 @@ def iot_device_import(
             if storage_authentication_type
             else None
         )
+
+        identity = (
+            ManagedIdentity(user_assigned_identity=identity)
+            if (identity not in [None, '[system]'] and
+                storage_authentication_type == AuthenticationType.identityBased.name)
+            else None
+        )
+
         import_request = ImportDevicesRequest(
             input_blob_container_uri=input_blob_container_uri,
             output_blob_container_uri=output_blob_container_uri,
             input_blob_name=None,
             output_blob_name=None,
             authentication_type=storage_authentication_type,
+            identity=identity,
         )
         return client.import_devices(
             target["resourcegroup"], hub_name, import_devices_parameters=import_request,
