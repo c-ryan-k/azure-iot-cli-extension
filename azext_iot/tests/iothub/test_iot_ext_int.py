@@ -1512,6 +1512,18 @@ class TestIoTStorage(IoTLiveScenarioTest):
             ],
         )
 
+        self.cmd(
+            'iot hub device-identity export -n {} --bcu "{}" --auth-type {} --identity {}'.format(
+                LIVE_HUB, LIVE_STORAGE, "identity", "[system]"
+            ),
+            checks=[
+                self.check("outputBlobContainerUri", LIVE_STORAGE),
+                self.check("failureReason", None),
+                self.check("type", "export"),
+                self.exists("jobId"),
+            ],
+        )
+
         # if we enabled identity for this hub, undo identity and RBAC
         if identity_enabled:
             # delete role assignment first, disabling identity removes the assignee ID from AAD
