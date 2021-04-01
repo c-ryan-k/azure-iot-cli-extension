@@ -17,18 +17,48 @@ hub_name = "HUBNAME"
 blob_container_uri = "https://example.com"
 resource_group_name = "RESOURCEGROUP"
 managed_identity = "EXAMPLEMANAGEDIDENTITY"
-generic_result = json.dumps({"result": generate_generic_id()})
+generic_job_response = {"JobResponse": generate_generic_id()}
+instance_name = generate_generic_id()
+qualified_hostname = "{}.subdomain.domain".format(instance_name)
 
 @pytest.fixture
 def get_mgmt_client(mocker, fixture_cmd):
     from azure.mgmt.iothub import IotHubClient
-    from azext_iot.digitaltwins.providers.auth import DigitalTwinAuthentication
+    from azext_iot.iothub.providers.auth import TrackTwoAuthentication
+    import sys
 
+    # discovery call to find iothub
+    patch_discovery = mocker.patch(
+        "azext_iot.iothub.providers.discovery.IotHubDiscovery.get_target"
+    )
+    patch_discovery.return_value = {
+        "resourcegroup": resource_group_name
+    }
+
+    # raw token for login credentials
     patched_get_raw_token = mocker.patch(
         "azure.cli.core._profile.Profile.get_raw_token"
     )
     patched_get_raw_token.return_value = (
-        mocker.MagicMock(name="creds"),
+        (
+            mocker.MagicMock(name="tokenType"),
+            mocker.MagicMock(name="accessToken", expires_on=sys.maxsize),
+            mocker.MagicMock(name="expires_on")
+        ),
+        mocker.MagicMock(name="subscription"),
+        mocker.MagicMock(name="tenant"),
+    )
+
+    # Authentication for login credentials and iot hub client
+    auth = TrackTwoAuthentication(
+        fixture_cmd, "00000000-0000-0000-0000-000000000000"
+    )
+
+    patched_get_login_credentials = mocker.patch(
+        "azure.cli.core._profile.Profile.get_login_credentials"
+    )
+    patched_get_login_credentials.return_value = (
+        auth,
         mocker.MagicMock(name="subscription"),
         mocker.MagicMock(name="tenant"),
     )
@@ -37,13 +67,32 @@ def get_mgmt_client(mocker, fixture_cmd):
         "azext_iot._factory.iot_hub_service_factory"
     )
     patch.return_value = IotHubClient(
-        credential=DigitalTwinAuthentication(
-            fixture_cmd, "00000000-0000-0000-0000-000000000000"
-        ),
+        credential=auth,
         subscription_id="00000000-0000-0000-0000-000000000000",
-    )
-
+    ).iot_hub_resource
     return patch
+
+
+def generate_device_identity(include_keys=False, auth_type=None, identity=None, rg=None):
+    return {
+        "include_keys": include_keys,
+        "storage_authentication_type": auth_type,
+        "identity": identity,
+        "resource_group_name": rg
+    }
+
+
+def assert_device_identity_result(actual, expected):
+    # the body from the call will be put into additional_properties
+    assert actual.job_id is None
+    assert actual.start_time_utc is None
+    assert actual.end_time_utc is None
+    assert actual.type is None
+    assert actual.status is None
+    assert actual.failure_reason is None
+    assert actual.status_message is None
+    assert actual.parent_job_id is None
+    assert actual.additional_properties == expected
 
 
 class TestIoTHubDeviceIdentityExport(object):
@@ -52,6 +101,18 @@ class TestIoTHubDeviceIdentityExport(object):
         mocked_response.assert_all_requests_are_fired = False
 
         mocked_response.add(
+            method=responses.GET,
+            content_type="application/json",
+            url=re.compile(
+                "https://(.*)management.azure.com/subscriptions/(.*)/"
+                "providers/Microsoft.Devices/IotHubs"
+            ),
+            status=200,
+            match_querystring=False,
+            body=json.dumps({"hostName": qualified_hostname}),
+        )
+
+        mocked_response.add(
             method=responses.POST,
             url=re.compile(
                 "https://management.azure.com/subscriptions/(.*)/"
@@ -59,7 +120,7 @@ class TestIoTHubDeviceIdentityExport(object):
                     hub_name
                 )
             ),
-            body=generic_result,
+            body=json.dumps(generic_job_response),
             status=200,
             content_type="application/json",
             match_querystring=False,
@@ -68,98 +129,109 @@ class TestIoTHubDeviceIdentityExport(object):
         yield mocked_response
 
     @pytest.mark.parametrize(
-        "blob_container_uri, include_keys, storage_authentication_type, identity, resource_group_name",
+        "req",
         [
-            (blob_container_uri, False, None, None, None),
-            (blob_container_uri, False, 'identity', None, None),
-            (blob_container_uri, False, 'identity', '[system]', None),
-            (blob_container_uri, False, 'identity', 'managed_identity', None),
-            (blob_container_uri, False, 'key', None, None),
-            (blob_container_uri, False, 'key', '[system]', None),
-            (blob_container_uri, False, 'identity', 'managed_identity', None),
-            (blob_container_uri, False, None, None, resource_group_name),
+            generate_device_identity(),
+            generate_device_identity(include_keys=True),
+            generate_device_identity(auth_type="identity"),
+            generate_device_identity(auth_type="identity", identity="[system]"),
+            generate_device_identity(auth_type="identity", identity="system"),
+            generate_device_identity(auth_type="identity", identity="managed_identity"),
+            generate_device_identity(auth_type="key"),
+            generate_device_identity(auth_type="key", identity="[system]"),
+            generate_device_identity(auth_type="key", identity="system"),
+            generate_device_identity(rg=resource_group_name),
         ]
     )
-    def test_device_identity_export(self, fixture_cmd, service_client, blob_container_uri, include_keys, storage_authentication_type, identity, resource_group_name):
+    def test_device_identity_export(self, fixture_cmd, service_client, req):
         result = subject.iot_device_export(
             cmd=fixture_cmd,
             hub_name=hub_name,
             blob_container_uri=blob_container_uri,
-            include_keys=include_keys,
-            storage_authentication_type=storage_authentication_type,
-            identity=identity,
-            resource_group_name=resource_group_name,
+            include_keys=req["include_keys"],
+            storage_authentication_type=req["storage_authentication_type"],
+            identity=req["identity"],
+            resource_group_name=req["resource_group_name"],
         )
-        # test = service_client.calls
-        # import pdb; pdb.set_trace()
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(f"The result in the test is {result.__dict__}")
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(f"payload is {result['payload']}")
-        print(f"Number of calls {len(service_client.calls)}")
 
         request = service_client.calls[0].request
         request_body = json.loads(request.body)
-        assert request_body["exportBlobContainerUri"] == blob_container_uri
-        assert request_body["excludeKeys"] == (not include_keys)
-        assert request_body["authenticationType"] == storage_authentication_type
-        if identity not in (None, "[system]"):
-            assert request_body["authenticationType"] == storage_authentication_type
 
-        assert result["payload"] == json.loads(generic_result)
+        assert request_body["exportBlobContainerUri"] == blob_container_uri
+        assert request_body["excludeKeys"] == (not req["include_keys"])
+        if req["storage_authentication_type"]:
+            assert request_body["authenticationType"] == req["storage_authentication_type"] + "Based"
+        if req["storage_authentication_type"] == "identityBased" and req["identity"] not in (None, "[system]"):
+            assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
+
+        assert_device_identity_result(result, generic_job_response)
 
 
 class TestIoTHubDeviceIdentityImport(object):
     @pytest.fixture
-    def service_client(self, mocked_response, fixture_ghcs, fixture_sas, request):
+    def service_client(self, mocked_response, get_mgmt_client):
         mocked_response.assert_all_requests_are_fired = False
+
+        mocked_response.add(
+            method=responses.GET,
+            content_type="application/json",
+            url=re.compile(
+                "https://(.*)management.azure.com/subscriptions/(.*)/"
+                "providers/Microsoft.Devices/IotHubs"
+            ),
+            status=200,
+            match_querystring=False,
+            body=json.dumps({"hostName": qualified_hostname}),
+        )
 
         mocked_response.add(
             method=responses.POST,
             content_type="application/json",
             url=re.compile(
                 "https://management.azure.com/subscriptions/(.*)/"
-                "providers/Microsoft.Devices/IotHubs/{}/exportDevices".format(
+                "providers/Microsoft.Devices/IotHubs/{}/importDevices".format(
                     hub_name
                 )
             ),
             status=200,
             match_querystring=False,
-            body=json.dumps(generic_result),
+            body=json.dumps(generic_job_response),
         )
 
         yield mocked_response
 
     @pytest.mark.parametrize(
-        "input_blob_container_uri, output_blob_container_uri, storage_authentication_type, identity, resource_group_name",
+        "req",
         [
-            (blob_container_uri, blob_container_uri, None, None, None),
-            (blob_container_uri, blob_container_uri, 'identity', None, None),
-            (blob_container_uri, blob_container_uri, 'identity', '[system]', None),
-            (blob_container_uri, blob_container_uri, 'identity', 'managed_identity', None),
-            (blob_container_uri, blob_container_uri, 'key', None, None),
-            (blob_container_uri, blob_container_uri, 'key', '[system]', None),
-            (blob_container_uri, blob_container_uri, 'identity', 'managed_identity', None),
-            (blob_container_uri, blob_container_uri, None, None, resource_group_name),
+            generate_device_identity(),
+            generate_device_identity(auth_type="identity"),
+            generate_device_identity(auth_type="identity", identity="[system]"),
+            generate_device_identity(auth_type="identity", identity="system"),
+            generate_device_identity(auth_type="identity", identity="managed_identity"),
+            generate_device_identity(auth_type="key"),
+            generate_device_identity(auth_type="key", identity="[system]"),
+            generate_device_identity(auth_type="key", identity="system"),
+            generate_device_identity(rg=resource_group_name),
         ]
     )
-    def test_device_identity_import(self, fixture_cmd, service_client, input_blob_container_uri, output_blob_container_uri, storage_authentication_type, identity, resource_group_name):
+    def test_device_identity_import(self, fixture_cmd, service_client, req):
         result = subject.iot_device_import(
             cmd=fixture_cmd,
             hub_name=hub_name,
-            input_blob_container_uri=input_blob_container_uri,
-            output_blob_container_uri=output_blob_container_uri,
-            storage_authentication_type=storage_authentication_type,
-            identity=identity,
-            resource_group_name=resource_group_name,
+            input_blob_container_uri=blob_container_uri,
+            output_blob_container_uri=blob_container_uri + "2",
+            storage_authentication_type=req["storage_authentication_type"],
+            identity=req["identity"],
+            resource_group_name=req["resource_group_name"],
         )
-        print(len(service_client.calls))
         request = service_client.calls[0].request
         request_body = json.loads(request.body)
-        assert request_body["exportBlobContainerUri"] == blob_container_uri
-        assert request_body["exportBlobContainerUri"] == blob_container_uri
-        assert request_body["authenticationType"] == storage_authentication_type
-        if identity not in ("", "[system]"):
-            assert request_body["authenticationType"] == storage_authentication_type
 
-        assert result == json.loads(generic_result)
+        assert request_body["inputBlobContainerUri"] == blob_container_uri
+        assert request_body["outputBlobContainerUri"] == blob_container_uri + "2"
+        if req["storage_authentication_type"]:
+            assert request_body["authenticationType"] == req["storage_authentication_type"] + "Based"
+        if req["storage_authentication_type"] == "identityBased" and req["identity"] not in (None, "[system]"):
+            assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
+
+        assert_device_identity_result(result, generic_job_response)

@@ -2321,7 +2321,6 @@ def iot_device_export(
             authentication_type=storage_authentication_type,
             identity=identity,
         )
-
         return client.export_devices(
             target["resourcegroup"], hub_name, export_devices_parameters=export_request,
         )
@@ -2385,6 +2384,7 @@ def iot_device_import(
             authentication_type=storage_authentication_type,
             identity=identity,
         )
+
         return client.import_devices(
             target["resourcegroup"], hub_name, import_devices_parameters=import_request,
         )
