@@ -18,8 +18,8 @@ blob_container_uri = "https://example.com"
 resource_group_name = "RESOURCEGROUP"
 managed_identity = "EXAMPLEMANAGEDIDENTITY"
 generic_job_response = {"JobResponse": generate_generic_id()}
-instance_name = generate_generic_id()
-qualified_hostname = "{}.subdomain.domain".format(instance_name)
+qualified_hostname = "{}.subdomain.domain".format(hub_name)
+
 
 @pytest.fixture
 def get_mgmt_client(mocker, fixture_cmd):
