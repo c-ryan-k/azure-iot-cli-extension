@@ -2693,7 +2693,6 @@ def _get_hub_connection_string(
                 hub.name, hub.additional_properties["resourcegroup"], policy_name
             )
         )
-
     if default_eventhub:
         cs_template_eventhub = (
             "Endpoint={};SharedAccessKeyName={};SharedAccessKey={};EntityPath={}"
