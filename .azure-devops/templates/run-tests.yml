@@ -16,10 +16,6 @@ steps:
 
   - template: set-testenv-sentinel.yml
 
-  - script: |
-      pip install azure-mgmt-iothub==1.0.0
-    displayName: Temporary - install track 2 SDK (1.0.0) for testing
-
   - ${{ if eq(parameters.runIntTests, 'true') }}:
     - task: AzureCLI@2
       continueOnError: true

@@ -438,11 +438,7 @@ class ISO8601Validator:
             return False
 
 
-<<<<<<< HEAD
 def ensure_iothub_sdk_min_version(min_ver):
-=======
-def ensure_min_version(min_ver):
->>>>>>> b7e9669... Added support for track 2 SDKs (azure-mgmt-iothub >= 1.0.0)
     from packaging import version
     try:
         from azure.mgmt.iothub import __version__ as iot_sdk_version

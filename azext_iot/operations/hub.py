@@ -2308,19 +2308,29 @@ def iot_device_export(
             else None
         )
 
-        identity = (
-            ManagedIdentity(user_assigned_identity=identity)
-            if (identity not in [None, '[system]'] and
-                storage_authentication_type == AuthenticationType.identityBased.name)
-            else None
-        )
-
         export_request = ExportDevicesRequest(
             export_blob_container_uri=blob_container_uri,
             exclude_keys=not include_keys,
             authentication_type=storage_authentication_type,
-            identity=identity,
         )
+
+        user_identity = identity not in [None, '[system]']
+        if user_identity and storage_authentication_type != AuthenticationType.identityBased.name:
+            raise CLIError(
+                "Device export with user-assigned identities requires identity-based authentication [--storage-auth-type]"
+            )
+        # 1.0.0 and newer SDKs provide support for user-assigned identity objects
+        # TODO - use actual released SDK version
+        if ensure_min_version("1.0.0") and user_identity:
+            from azure.mgmt.iothub.models import ManagedIdentity
+            export_request.identity = ManagedIdentity(user_assigned_identity=identity)
+        # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
+        elif user_identity:
+            # TODO - use actual released SDK version
+            raise CLIError(
+                "Device export with user-assigned identities requires a dependency of azure-mgmt-iothub>=1.0.0"
+            )
+
         return client.export_devices(
             target["resourcegroup"], hub_name, export_devices_parameters=export_request,
         )
@@ -2369,21 +2379,29 @@ def iot_device_import(
             else None
         )
 
-        identity = (
-            ManagedIdentity(user_assigned_identity=identity)
-            if (identity not in [None, '[system]'] and
-                storage_authentication_type == AuthenticationType.identityBased.name)
-            else None
-        )
-
         import_request = ImportDevicesRequest(
             input_blob_container_uri=input_blob_container_uri,
             output_blob_container_uri=output_blob_container_uri,
             input_blob_name=None,
             output_blob_name=None,
             authentication_type=storage_authentication_type,
-            identity=identity,
         )
+
+        user_identity = identity not in [None, '[system]']
+        if user_identity and storage_authentication_type != AuthenticationType.identityBased.name:
+            raise CLIError(
+                "Device import with user-assigned identities requires identity-based authentication [--storage-auth-type]"
+            )
+        # 1.0.0 and newer SDKs provide support for user-assigned identity objects
+        # TODO - use actual released SDK version
+        if ensure_min_version("1.0.0") and user_identity:
+            from azure.mgmt.iothub.models import ManagedIdentity
+            import_request.identity = ManagedIdentity(user_assigned_identity=identity)
+        # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
+        elif user_identity:
+            raise CLIError(
+                "Device import with user-assigned identities requires a dependency of azure-mgmt-iothub>=1.0.0"
+            )
 
         return client.import_devices(
             target["resourcegroup"], hub_name, import_devices_parameters=import_request,
