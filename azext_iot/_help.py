@@ -260,7 +260,7 @@ helps[
 ] = """
     type: command
     short-summary: Export all device identities from an IoT Hub to an Azure Storage blob container. For inline
-                   blob container SAS uri input or identity based authentication, please review the input rules of your environment.
+                   blob container SAS uri input, please review the input rules of your environment.
     long-summary: For more information, see
                   https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-identity-registry#import-and-export-device-identities
     examples:
@@ -288,8 +288,8 @@ helps[
     "iot hub device-identity import"
 ] = """
     type: command
-    short-summary: Import device identities to an IoT Hub from a blob. Needs keys  For inline
-                   blob container SAS uri input or identity based authentication, please review the input rules of your environment.
+    short-summary: Import device identities to an IoT Hub from a blob. For inline
+                   blob container SAS uri input, please review the input rules of your environment.
     long-summary: For more information, see
                   https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-identity-registry#import-and-export-device-identities
     examples:
