@@ -12,6 +12,8 @@ from knack.cli import CLIError
 from azext_iot.operations import hub as subject
 from azext_iot.tests.generators import generate_generic_id
 from azext_iot.tests.conftest import mock_target
+from azext_iot.common.utility import ensure_iothub_sdk_min_version
+from azext_iot.constants import IOTHUB_TRACK_2_SDK_MIN_VERSION
 
 hub_name = "HUBNAME"
 blob_container_uri = "https://example.com"
@@ -24,7 +26,6 @@ qualified_hostname = "{}.subdomain.domain".format(hub_name)
 @pytest.fixture
 def get_mgmt_client(mocker, fixture_cmd):
     from azure.mgmt.iothub import IotHubClient
-    from azext_iot.iothub.providers.auth import TrackTwoAuthentication
     import sys
 
     # discovery call to find iothub
@@ -40,25 +41,15 @@ def get_mgmt_client(mocker, fixture_cmd):
         "azure.cli.core._profile.Profile.get_raw_token"
     )
     patched_get_raw_token.return_value = (
-        (
-            mocker.MagicMock(name="tokenType"),
-            mocker.MagicMock(name="accessToken", expires_on=sys.maxsize),
-            mocker.MagicMock(name="expires_on")
-        ),
+        mocker.MagicMock(name="creds"),
         mocker.MagicMock(name="subscription"),
         mocker.MagicMock(name="tenant"),
-    )
-
-    # Authentication for login credentials and iot hub client
-    auth = TrackTwoAuthentication(
-        fixture_cmd, "00000000-0000-0000-0000-000000000000"
     )
 
     patched_get_login_credentials = mocker.patch(
         "azure.cli.core._profile.Profile.get_login_credentials"
     )
     patched_get_login_credentials.return_value = (
-        auth,
         mocker.MagicMock(name="subscription"),
         mocker.MagicMock(name="tenant"),
     )
@@ -66,10 +57,17 @@ def get_mgmt_client(mocker, fixture_cmd):
     patch = mocker.patch(
         "azext_iot._factory.iot_hub_service_factory"
     )
-    patch.return_value = IotHubClient(
-        credential=auth,
-        subscription_id="00000000-0000-0000-0000-000000000000",
-    ).iot_hub_resource
+    if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION):
+        patch.return_value = IotHubClient(
+            credential='',
+            subscription_id="00000000-0000-0000-0000-000000000000",
+        ).iot_hub_resource
+    else:
+        patch.return_value = IotHubClient(
+            credentials='',
+            subscription_id="00000000-0000-0000-0000-000000000000",
+        ).iot_hub_resource
+
     return patch
 
 
@@ -134,16 +132,47 @@ class TestIoTHubDeviceIdentityExport(object):
             generate_device_identity(),
             generate_device_identity(include_keys=True),
             generate_device_identity(auth_type="identity"),
-            generate_device_identity(auth_type="identity", identity="[system]"),
-            generate_device_identity(auth_type="identity", identity="system"),
-            generate_device_identity(auth_type="identity", identity="managed_identity"),
             generate_device_identity(auth_type="key"),
-            generate_device_identity(auth_type="key", identity="[system]"),
-            generate_device_identity(auth_type="key", identity="system"),
             generate_device_identity(rg=resource_group_name),
         ]
     )
-    def test_device_identity_export(self, fixture_cmd, service_client, req):
+    def test_device_identity_export_track1(self, fixture_cmd, service_client, req):
+        result = subject.iot_device_export(
+            cmd=fixture_cmd,
+            hub_name=hub_name,
+            blob_container_uri=blob_container_uri,
+            include_keys=req["include_keys"],
+            storage_authentication_type=req["storage_authentication_type"],
+            resource_group_name=req["resource_group_name"],
+        )
+
+        request = service_client.calls[0].request
+        request_body = json.loads(request.body)
+
+        assert request_body["exportBlobContainerUri"] == blob_container_uri
+        assert request_body["excludeKeys"] == (not req["include_keys"])
+        if req["storage_authentication_type"]:
+            assert request_body["authenticationType"] == req["storage_authentication_type"] + "Based"
+        if req["storage_authentication_type"] == "identityBased" and req["identity"] not in (None, "[system]"):
+            assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
+
+        assert_device_identity_result(result, generic_job_response)
+
+    @pytest.mark.parametrize(
+        "req",
+        [
+            generate_device_identity(),
+            generate_device_identity(include_keys=True),
+            generate_device_identity(auth_type="identity"),
+            generate_device_identity(auth_type="key"),
+            generate_device_identity(rg=resource_group_name),
+            generate_device_identity(auth_type="identity", identity="[system]"),
+            generate_device_identity(auth_type="identity", identity="system"),
+            generate_device_identity(auth_type="identity", identity="managed_identity"),
+        ]
+    )
+    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    def test_device_identity_export_track2(self, fixture_cmd, service_client, req):
         result = subject.iot_device_export(
             cmd=fixture_cmd,
             hub_name=hub_name,
@@ -165,6 +194,26 @@ class TestIoTHubDeviceIdentityExport(object):
             assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
 
         assert_device_identity_result(result, generic_job_response)
+
+    @pytest.mark.parametrize(
+        "req",
+        [
+            generate_device_identity(auth_type="key", identity="[system]"),
+            generate_device_identity(auth_type="key", identity="system"),
+        ]
+    )
+    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    def test_device_identity_export_input(self, fixture_cmd, req):
+        with pytest.raises(CLIError):
+            subject.iot_device_export(
+                cmd=fixture_cmd,
+                hub_name=hub_name,
+                blob_container_uri=blob_container_uri,
+                include_keys=req["include_keys"],
+                storage_authentication_type=req["storage_authentication_type"],
+                identity=req["identity"],
+                resource_group_name=req["resource_group_name"],
+            )
 
 
 class TestIoTHubDeviceIdentityImport(object):
@@ -205,16 +254,44 @@ class TestIoTHubDeviceIdentityImport(object):
         [
             generate_device_identity(),
             generate_device_identity(auth_type="identity"),
-            generate_device_identity(auth_type="identity", identity="[system]"),
-            generate_device_identity(auth_type="identity", identity="system"),
-            generate_device_identity(auth_type="identity", identity="managed_identity"),
             generate_device_identity(auth_type="key"),
-            generate_device_identity(auth_type="key", identity="[system]"),
-            generate_device_identity(auth_type="key", identity="system"),
             generate_device_identity(rg=resource_group_name),
         ]
     )
-    def test_device_identity_import(self, fixture_cmd, service_client, req):
+    def test_device_identity_import_track1(self, fixture_cmd, service_client, req):
+        result = subject.iot_device_import(
+            cmd=fixture_cmd,
+            hub_name=hub_name,
+            input_blob_container_uri=blob_container_uri,
+            output_blob_container_uri=blob_container_uri + "2",
+            storage_authentication_type=req["storage_authentication_type"],
+            resource_group_name=req["resource_group_name"],
+        )
+        request = service_client.calls[0].request
+        request_body = json.loads(request.body)
+
+        assert request_body["inputBlobContainerUri"] == blob_container_uri
+        assert request_body["outputBlobContainerUri"] == blob_container_uri + "2"
+        if req["storage_authentication_type"]:
+            assert request_body["authenticationType"] == req["storage_authentication_type"] + "Based"
+        if req["storage_authentication_type"] == "identityBased" and req["identity"] not in (None, "[system]"):
+            assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
+
+        assert_device_identity_result(result, generic_job_response)
+
+    @pytest.mark.parametrize(
+        "req",
+        [
+            generate_device_identity(),
+            generate_device_identity(auth_type="identity"),
+            generate_device_identity(auth_type="key"),
+            generate_device_identity(rg=resource_group_name),
+            generate_device_identity(auth_type="identity", identity="[system]"),
+            generate_device_identity(auth_type="identity", identity="managed_identity"),
+        ]
+    )
+    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    def test_device_identity_import_track2(self, fixture_cmd, service_client, req):
         result = subject.iot_device_import(
             cmd=fixture_cmd,
             hub_name=hub_name,
@@ -235,3 +312,23 @@ class TestIoTHubDeviceIdentityImport(object):
             assert request_body["identity"]["userAssignedIdentity"] == req["identity"]
 
         assert_device_identity_result(result, generic_job_response)
+
+    @pytest.mark.parametrize(
+        "req",
+        [
+            generate_device_identity(auth_type="key", identity="[system]"),
+            generate_device_identity(auth_type="key", identity="managed_identity"),
+        ]
+    )
+    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    def test_device_identity_import_input(self, fixture_cmd, req):
+        with pytest.raises(CLIError):
+            subject.iot_device_import(
+                cmd=fixture_cmd,
+                hub_name=hub_name,
+                input_blob_container_uri=blob_container_uri,
+                output_blob_container_uri=blob_container_uri + "2",
+                storage_authentication_type=req["storage_authentication_type"],
+                identity=req["identity"],
+                resource_group_name=req["resource_group_name"],
+            )
