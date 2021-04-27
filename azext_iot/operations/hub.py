@@ -16,6 +16,7 @@ from azext_iot.constants import (
     TRACING_PROPERTY,
     TRACING_ALLOWED_FOR_LOCATION,
     TRACING_ALLOWED_FOR_SKU,
+    IOTHUB_TRACK_2_SDK_MIN_VERSION,
 )
 from azext_iot.common.sas_token_auth import SasTokenAuthentication
 from azext_iot.common.shared import (
@@ -2299,7 +2300,12 @@ def iot_device_export(
         blob_container_uri = read_file_content(blob_container_uri)
 
     if ensure_iothub_sdk_min_version("0.12.0"):
-        from azure.mgmt.iothub.models import ExportDevicesRequest
+        # TODO - remove once stable SDK is published with new models
+        if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION):
+            from azure.mgmt.iothub.v2021_03_03_preview.models import ExportDevicesRequest
+        else:
+            from azure.mgmt.iothub.models import ExportDevicesRequest
+
         from azext_iot.common.shared import AuthenticationType
 
         storage_authentication_type = (
@@ -2319,14 +2325,14 @@ def iot_device_export(
             raise CLIError(
                 "Device export with user-assigned identities requires identity-based authentication [--storage-auth-type]"
             )
-        # 1.0.0 and newer SDKs provide support for user-assigned identity objects
-        # TODO - use actual released SDK version
-        if ensure_min_version("1.0.0") and user_identity:
-            from azure.mgmt.iothub.models import ManagedIdentity
+        # {IOTHUB_TRACK_2_SDK_MIN_VERSION} and newer SDKs provide support for user-assigned identity objects
+        # TODO - use actual released SDK version, fix ManagedIdentity model path
+        if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION) and user_identity:
+            from azure.mgmt.iothub.v2021_03_03_preview.models import ManagedIdentity
             export_request.identity = ManagedIdentity(user_assigned_identity=identity)
+
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
         elif user_identity:
-            # TODO - use actual released SDK version
             raise CLIError(
                 "Device export with user-assigned identities requires a dependency of azure-mgmt-iothub>=1.0.0"
             )
@@ -2370,7 +2376,12 @@ def iot_device_import(
         output_blob_container_uri = read_file_content(output_blob_container_uri)
 
     if ensure_iothub_sdk_min_version("0.12.0"):
-        from azure.mgmt.iothub.models import ImportDevicesRequest
+        # TODO - remove once stable SDK is published with new models
+        if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION):
+            from azure.mgmt.iothub.v2021_03_03_preview.models import ImportDevicesRequest
+        else:
+            from azure.mgmt.iothub.models import ImportDevicesRequest
+
         from azext_iot.common.shared import AuthenticationType
 
         storage_authentication_type = (
@@ -2392,10 +2403,10 @@ def iot_device_import(
             raise CLIError(
                 "Device import with user-assigned identities requires identity-based authentication [--storage-auth-type]"
             )
-        # 1.0.0 and newer SDKs provide support for user-assigned identity objects
-        # TODO - use actual released SDK version
-        if ensure_min_version("1.0.0") and user_identity:
-            from azure.mgmt.iothub.models import ManagedIdentity
+        # {IOTHUB_TRACK_2_SDK_MIN_VERSION} and newer SDKs provide support for user-assigned identity objects
+        # TODO - use actual released SDK version, fix ManagedIdentity model path
+        if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION) and user_identity:
+            from azure.mgmt.iothub.v2021_03_03_preview.models import ManagedIdentity
             import_request.identity = ManagedIdentity(user_assigned_identity=identity)
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
         elif user_identity:
