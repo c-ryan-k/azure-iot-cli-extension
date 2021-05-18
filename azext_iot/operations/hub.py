@@ -2328,7 +2328,8 @@ def iot_device_export(
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
         elif user_identity:
             raise CLIError(
-                "Device export with user-assigned identities requires a dependency of azure-mgmt-iothub>={}".format(IOTHUB_TRACK_2_SDK_MIN_VERSION)
+                "Device export with user-assigned identities requires a dependency of azure-mgmt-iothub>={}"
+                .format(IOTHUB_TRACK_2_SDK_MIN_VERSION)
             )
 
         return client.export_devices(
@@ -2400,7 +2401,8 @@ def iot_device_import(
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
         elif user_identity:
             raise CLIError(
-                "Device import with user-assigned identities requires a dependency of azure-mgmt-iothub>={}".format(IOTHUB_TRACK_2_SDK_MIN_VERSION)
+                "Device import with user-assigned identities requires a dependency of azure-mgmt-iothub>={}"
+                .format(IOTHUB_TRACK_2_SDK_MIN_VERSION)
             )
 
         return client.import_devices(

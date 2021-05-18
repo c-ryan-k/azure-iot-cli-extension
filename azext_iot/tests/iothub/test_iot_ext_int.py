@@ -7,8 +7,6 @@
 import os
 import pytest
 import warnings
-import json
-
 from azext_iot.common.utility import read_file_content, ensure_iothub_sdk_min_version
 from azext_iot.tests import IoTLiveScenarioTest
 from azext_iot.tests.settings import DynamoSettings, ENV_SET_TEST_IOTHUB_BASIC
@@ -1512,7 +1510,9 @@ class TestIoTStorage(IoTLiveScenarioTest):
         not all([LIVE_STORAGE_ID, LIVE_STORAGE]),
         reason="azext_iot_identity_teststorageid and azext_iot_teststorageuri env vars not set",
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_system_identity_storage(self):
         identity_type_enable = "SystemAssigned"
         storage_role = "Storage Blob Data Contributor"
@@ -1624,7 +1624,9 @@ class TestIoTStorage(IoTLiveScenarioTest):
         not all([LIVE_STORAGE_ID, LIVE_STORAGE]),
         reason="azext_iot_identity_teststorageid and azext_iot_teststorageuri env vars not set",
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_user_identity_storage(self):
         # User Assigned Managed Identity
         storage_role = "Storage Blob Data Contributor"

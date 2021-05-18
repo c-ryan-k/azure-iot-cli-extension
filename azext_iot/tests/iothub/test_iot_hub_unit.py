@@ -11,7 +11,6 @@ import json
 from knack.cli import CLIError
 from azext_iot.operations import hub as subject
 from azext_iot.tests.generators import generate_generic_id
-from azext_iot.tests.conftest import mock_target
 from azext_iot.common.utility import ensure_iothub_sdk_min_version
 from azext_iot.constants import IOTHUB_TRACK_2_SDK_MIN_VERSION
 
@@ -26,7 +25,6 @@ qualified_hostname = "{}.subdomain.domain".format(hub_name)
 @pytest.fixture
 def get_mgmt_client(mocker, fixture_cmd):
     from azure.mgmt.iothub import IotHubClient
-    import sys
 
     # discovery call to find iothub
     patch_discovery = mocker.patch(
@@ -172,7 +170,9 @@ class TestIoTHubDeviceIdentityExport(object):
             generate_device_identity(auth_type="identity", identity="managed_identity"),
         ]
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_device_identity_export_track2(self, fixture_cmd, service_client, req):
         result = subject.iot_device_export(
             cmd=fixture_cmd,
@@ -203,7 +203,9 @@ class TestIoTHubDeviceIdentityExport(object):
             generate_device_identity(auth_type="key", identity="system"),
         ]
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_device_identity_export_input(self, fixture_cmd, req):
         with pytest.raises(CLIError):
             subject.iot_device_export(
@@ -291,7 +293,9 @@ class TestIoTHubDeviceIdentityImport(object):
             generate_device_identity(auth_type="identity", identity="managed_identity"),
         ]
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_device_identity_import_track2(self, fixture_cmd, service_client, req):
         result = subject.iot_device_import(
             cmd=fixture_cmd,
@@ -321,7 +325,9 @@ class TestIoTHubDeviceIdentityImport(object):
             generate_device_identity(auth_type="key", identity="managed_identity"),
         ]
     )
-    @pytest.mark.skipif(not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION), reason="Skipping track 2 tests because SDK is track 1")
+    @pytest.mark.skipif(
+        not ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION),
+        reason="Skipping track 2 tests because SDK is track 1")
     def test_device_identity_import_input(self, fixture_cmd, req):
         with pytest.raises(CLIError):
             subject.iot_device_import(
