@@ -2322,7 +2322,7 @@ def iot_device_export(
             )
         # Track 2 CLI SDKs provide support for user-assigned identity objects
         if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION) and user_identity:
-            from azure.mgmt.iothub.models import ManagedIdentity
+            from azure.mgmt.iothub.models import ManagedIdentity  # pylint: disable=no-name-in-module
             export_request.identity = ManagedIdentity(user_assigned_identity=identity)
 
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
@@ -2395,7 +2395,7 @@ def iot_device_import(
             )
         # Track 2 CLI SDKs provide support for user-assigned identity objects
         if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION) and user_identity:
-            from azure.mgmt.iothub.models import ManagedIdentity
+            from azure.mgmt.iothub.models import ManagedIdentity  # pylint: disable=no-name-in-module
             import_request.identity = ManagedIdentity(user_assigned_identity=identity)
         # if the user supplied a user-assigned identity, let them know they need a new CLI/SDK
         elif user_identity:

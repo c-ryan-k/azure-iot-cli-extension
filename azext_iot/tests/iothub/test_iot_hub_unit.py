@@ -57,6 +57,7 @@ def get_mgmt_client(mocker, fixture_cmd):
     patch = mocker.patch(
         "azext_iot._factory.iot_hub_service_factory"
     )
+    # pylint: disable=no-value-for-parameter, unexpected-keyword-arg
     if ensure_iothub_sdk_min_version(IOTHUB_TRACK_2_SDK_MIN_VERSION):
         patch.return_value = IotHubClient(
             credential='',
