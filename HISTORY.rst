@@ -23,6 +23,7 @@ Release History
 **IoT Hub updates**
 
 * Removal of `az iot hub certificate root-authority`. For any issues, email iot-ca-updates@microsoft.com.
+* `iot hub state` commands have better error handling.
 
 
 0.25.0

@@ -209,6 +209,35 @@ class StateProvider(IoTHubProvider):
         """
         hub_state = {}
 
+        
+        # Controlplane using ARM
+        if HubAspects.Arm.value in hub_aspects:
+            try:
+                hub_aspects.remove(HubAspects.Arm.value)
+                hub_name = target.get("entity").split(".")[0]
+                hub_rg = target.get("resourcegroup")
+
+                control_plane_obj = self.discovery.find_resource(hub_name, hub_rg)
+
+                if not hub_rg:
+                    hub_rg = control_plane_obj.additional_properties["resourcegroup"]
+                hub_resource_id = control_plane_obj.id
+                export_command = f"group export -n {hub_rg} --resource-ids '{hub_resource_id}' --skip-all-params"
+                hub_arm = cli.invoke(export_command).as_json()
+
+                # Check if the hub exists in the returned template
+                if not hub_arm.get("resources") or len(hub_arm["resources"]) == 0:
+                    hub_state["arm"] = {}
+                    logger.warning(usr_msgs.MISSING_HUB_ARM_RESOURCE_MSG.format(export_command))
+                else:    
+                    hub_state["arm"] = hub_arm
+                    hub_resource = hub_state["arm"]["resources"][0]
+                    self.check_controlplane(hub_resource=hub_resource)
+                    print(usr_msgs.SAVE_ARM_DESC)
+            except (KeyError, IndexError, AzCLIError):
+                logger.warning(usr_msgs.HUB_ARM_PARSING_MSG.format(export_command))
+
+
         if HubAspects.Configurations.value in hub_aspects:
             hub_aspects.remove(HubAspects.Configurations.value)
             # Basic tier does not support list config
@@ -235,22 +264,6 @@ class StateProvider(IoTHubProvider):
             devices = self.download_devices(target=target)
             if devices:
                 hub_state["devices"] = devices
-
-        # Controlplane using ARM
-        if HubAspects.Arm.value in hub_aspects:
-            hub_name = target.get("entity").split(".")[0]
-            hub_rg = target.get("resourcegroup")
-
-            control_plane_obj = self.discovery.find_resource(hub_name, hub_rg)
-
-            if not hub_rg:
-                hub_rg = control_plane_obj.additional_properties["resourcegroup"]
-            hub_resource_id = control_plane_obj.id
-            hub_arm = cli.invoke(f"group export -n {hub_rg} --resource-ids '{hub_resource_id}' --skip-all-params").as_json()
-            hub_state["arm"] = hub_arm
-            hub_resource = hub_state["arm"]["resources"][0]
-            self.check_controlplane(hub_resource=hub_resource)
-            print(usr_msgs.SAVE_ARM_DESC)
 
         return hub_state
 
