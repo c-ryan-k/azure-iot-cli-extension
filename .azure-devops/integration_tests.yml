@@ -123,7 +123,10 @@ stages:
       pythonVersions: ${{ parameters.pythonVersionsTestingMatrix }}
     condition: succeeded()
     pool:
-      vmImage: ${{ parameters.testAgentVmImage }}
+      ${{ if eq(parameters.azureCLIVersion, 'msi') }}:
+        vmImage: 'windows-2025'
+      ${{ else }}:
+        vmImage: ${{ parameters.testAgentVmImage }}
     jobs:
       - template: templates/trigger-tests.yml
         parameters:
@@ -150,7 +153,10 @@ stages:
       pythonVersions: ${{ parameters.pythonVersionsTestingMatrix }}
     condition: succeeded()
     pool:
-      vmImage: ${{ parameters.testAgentVmImage }}
+      ${{ if eq(parameters.azureCLIVersion, 'msi') }}:
+        vmImage: 'windows-2025'
+      ${{ else }}:
+        vmImage: ${{ parameters.testAgentVmImage }}
     jobs:
       - template: templates/smoke-tests.yml
         parameters:
