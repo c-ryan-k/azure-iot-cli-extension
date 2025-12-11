@@ -1071,12 +1071,6 @@ def load_arguments(self, _):
             arg_type=dps_auth_type_dataplane_param_type,
         )
 
-    # Apply arg_group only to dataplane commands
-    for dps_dataplane_command in ["compute-device-key", "connection-string", "enrollment", "enrollment-group"]:
-        with self.argument_context(f"iot dps {dps_dataplane_command}") as context:
-            context.argument("dps_name", arg_group="Device Provisioning Service Identifier")
-            context.argument("login", arg_group="Device Provisioning Service Identifier")
-
     with self.argument_context("iot dps compute-device-key") as context:
         context.argument(
             "enrollment_id",
