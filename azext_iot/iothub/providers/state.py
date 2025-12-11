@@ -1006,7 +1006,7 @@ class StateProvider(IoTHubProvider):
         # serialize strips name and etag - use as_dict instead
         certificates = cert_client.list_by_iot_hub(self.rg, self.hub_name).as_dict()
 
-        # TODO - need to support SDKs with/without match_condition argument
+        # TODO - may need to support SDKs with/without match_condition argument unless kwargs will eat it (TypeError)
         for cert in tqdm(certificates["value"], desc=usr_msgs.DELETE_CERT_DESC, ascii=" #"):
             cert_client.delete(
                 resource_group_name=self.rg,

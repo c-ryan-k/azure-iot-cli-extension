@@ -34,6 +34,9 @@ from azure.core.exceptions import HttpResponseError
 
 logger = get_logger(__name__)
 
+# TODO - CMS - Determine safe SDK handling methods for parameters that may have changed (eTag/if-match)
+
+
 
 class MessageEndpoint(IoTHubProvider):
     def __init__(

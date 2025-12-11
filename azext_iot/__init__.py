@@ -30,6 +30,7 @@ class IoTExtCommandsLoader(AzCommandsLoader):
         from azext_iot.digitaltwins.command_map import load_digitaltwins_commands
         from azext_iot.dps.command_map import load_dps_commands
         from azext_iot.deviceupdate.command_map import load_deviceupdate_commands
+        from azext_iot.adr.command_map import load_adr_commands
 
         load_command_table(self, args)
         load_deviceupdate_commands(self, args)
@@ -37,6 +38,7 @@ class IoTExtCommandsLoader(AzCommandsLoader):
         load_central_commands(self, args)
         load_digitaltwins_commands(self, args)
         load_dps_commands(self, args)
+        load_adr_commands(self, args)
 
         # TODO - CMS Preview - commands
         load_core_commands(self, args)
@@ -51,6 +53,7 @@ class IoTExtCommandsLoader(AzCommandsLoader):
         from azext_iot.digitaltwins.params import load_digitaltwins_arguments
         from azext_iot.dps.params import load_dps_arguments
         from azext_iot.deviceupdate.params import load_deviceupdate_arguments
+        from azext_iot.adr.params import load_adr_management_arguments
 
         load_arguments(self, command)
         load_iothub_arguments(self, command)
@@ -58,6 +61,7 @@ class IoTExtCommandsLoader(AzCommandsLoader):
         load_digitaltwins_arguments(self, command)
         load_dps_arguments(self, command)
         load_deviceupdate_arguments(self, command)
+        load_adr_management_arguments(self, command)
 
         # TODO - CMS Preview - arguments
         load_core_arguments(self, command)

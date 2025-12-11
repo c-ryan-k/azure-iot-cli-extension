@@ -138,6 +138,40 @@ def resource_service_factory(cli_ctx, **_):
     return get_mgmt_service_client(cli_ctx, ResourceType.MGMT_RESOURCE_RESOURCES)
 
 
+def adr_service_factory(cli_ctx, *_):
+    """
+    Factory for importing deps and getting service client resources.
+
+    Args:
+        cli_ctx (knack.cli.CLI): CLI context.
+        *_ : all other args ignored.
+
+    Returns:
+        service_client (DeviceRegistryManagementService): operational resource for
+            working with Azure Device Registry Service.
+    """
+    from azure.cli.core.commands.client_factory import get_subscription_id
+
+    from azext_iot.sdk.deviceregistry.mgmt import DeviceRegistryMgmtClient
+
+    subscription_id = get_subscription_id(cli_ctx)
+
+    return DeviceRegistryMgmtClient(
+        credential=AZURE_CLI_CREDENTIAL,
+        subscription_id=subscription_id,
+        endpoint=cli_ctx.cloud.endpoints.resource_manager,
+        user_agent_policy=UserAgentPolicy(user_agent=USER_AGENT),
+        http_logging_policy=_get_default_logging_policy(),
+    )
+
+
+def resource_service_factory(cli_ctx, **_):
+    from azure.cli.core.commands.client_factory import get_mgmt_service_client
+    from azure.cli.core.profiles import ResourceType
+
+    return get_mgmt_service_client(cli_ctx, ResourceType.MGMT_RESOURCE_RESOURCES)
+
+
 class SdkResolver(object):
     def __init__(self, target, device_id=None, auth_override=None):
         self.target = target
